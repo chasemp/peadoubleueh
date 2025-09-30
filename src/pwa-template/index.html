@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PWA Template - Best Practices</title>
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- Theme Color for Mobile -->
+  <meta name="theme-color" content="#2196F3">
+  
+  <!-- Apple Touch Icon -->
+  <link rel="apple-touch-icon" href="assets/icon-192x192.png">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/styles.css">
+  
+  <!-- Critical CSS Inline for Performance -->
+  <style>
+    /* Critical CSS - Above the fold content */
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .header { background: #2196F3; color: white; padding: 1rem; }
+    .main { padding: 1rem; }
+    .loading { text-align: center; padding: 2rem; }
+  </style>
+</head>
+<body>
+  <!-- PWA Install Prompt (Hidden by default) -->
+  <div id="install-prompt" class="install-prompt" style="display: none;">
+    <div class="install-content">
+      <h3>Install App</h3>
+      <p>Install this app on your device for a better experience!</p>
+      <button id="install-btn" class="btn btn-primary">Install</button>
+      <button id="dismiss-install" class="btn btn-secondary">Not Now</button>
+    </div>
+  </div>
+
+  <!-- Update Available Prompt -->
+  <div id="update-prompt" class="update-prompt" style="display: none;">
+    <div class="update-content">
+      <h3>Update Available</h3>
+      <p>A new version is available. Update now?</p>
+      <button id="update-btn" class="btn btn-primary">Update</button>
+      <button id="dismiss-update" class="btn btn-secondary">Later</button>
+    </div>
+  </div>
+
+  <!-- Main App Structure -->
+  <header class="header">
+    <div class="header-content">
+      <h1>PWA Template</h1>
+      <div class="header-actions">
+        <button id="theme-toggle" class="btn btn-icon" aria-label="Toggle theme">🌙</button>
+        <button id="settings-btn" class="btn btn-icon" aria-label="Settings">⚙️</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- Loading State -->
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+      <p>Loading...</p>
+    </div>
+
+    <!-- Main Content -->
+    <div id="content" class="content" style="display: none;">
+      <section class="hero">
+        <h2>Welcome to PWA Template</h2>
+        <p>This template includes all the best practices we've learned from building multiple PWAs.</p>
+      </section>
+
+      <section class="features">
+        <h3>Features Included</h3>
+        <div class="feature-grid">
+          <div class="feature-card">
+            <h4>📱 Mobile-First Design</h4>
+            <p>Responsive design with touch-friendly interactions</p>
+          </div>
+          <div class="feature-card">
+            <h4>⚡ Performance Optimized</h4>
+            <p>Fast loading with efficient caching strategies</p>
+          </div>
+          <div class="feature-card">
+            <h4>🔄 Cache Busting</h4>
+            <p>Smart update detection and cache invalidation</p>
+          </div>
+          <div class="feature-card">
+            <h4>🎨 Theme Support</h4>
+            <p>Light/dark theme with system preference detection</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="demo">
+        <h3>Demo Features</h3>
+        <div class="demo-controls">
+          <button id="test-cache-busting" class="btn btn-primary">Test Cache Busting</button>
+          <button id="test-offline" class="btn btn-secondary">Test Offline Mode</button>
+          <button id="test-notifications" class="btn btn-secondary">Test Notifications</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Settings</h3>
+        <button id="close-settings" class="btn btn-icon" aria-label="Close">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="setting-group">
+          <label for="theme-select">Theme:</label>
+          <select id="theme-select">
+            <option value="auto">Auto (System)</option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </div>
+        <div class="setting-group">
+          <label for="notifications-toggle">Notifications:</label>
+          <input type="checkbox" id="notifications-toggle" checked>
+        </div>
+        <div class="setting-group">
+          <label for="auto-update-toggle">Auto Update:</label>
+          <input type="checkbox" id="auto-update-toggle" checked>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/utils/StorageManager.js"></script>
+  <script src="js/utils/ThemeManager.js"></script>
+  <script src="js/utils/NotificationManager.js"></script>
+  <script src="js/utils/PerformanceMonitor.js"></script>
+  <script src="js/strategies/CacheBustingManager.js"></script>
+  <script src="js/service-workers/ServiceWorkerManager.js"></script>
+  <script src="js/PWAApp.js"></script>
+</body>
+</html>
