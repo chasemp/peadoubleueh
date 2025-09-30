@@ -6,11 +6,323 @@
 
 ## 📋 Table of Contents
 
-1. [Module Loading & Dependencies](#module-loading--dependencies)
-2. [PWA Architecture & Service Workers](#pwa-architecture--service-workers)
-3. [State Management & Data Persistence](#state-management--data-persistence)
-4. [Performance & Optimization](#performance--optimization)
-5. [Technical Debugging](#technical-debugging)
+1. [PWA Architecture Patterns](#pwa-architecture-patterns)
+2. [Module Loading & Dependencies](#module-loading--dependencies)
+3. [PWA Architecture & Service Workers](#pwa-architecture--service-workers)
+4. [State Management & Data Persistence](#state-management--data-persistence)
+5. [Performance & Optimization](#performance--optimization)
+6. [Technical Debugging](#technical-debugging)
+
+---
+
+## 🏗️ PWA Architecture Patterns
+
+### **The Monolithic PWA Anti-Pattern**
+
+#### **❌ What NOT to Do**
+```javascript
+// ❌ BAD - Everything in one massive class (3,741 lines!)
+class PWAApp {
+  constructor() {
+    // 15+ manager instantiations
+    this.blockManager = new BlockManager();
+    this.petrificationManager = new PetrificationManager();
+    this.deadPixelsManager = new DeadPixelsManager();
+    this.blockPalette = new BlockPalette(/*...*/);
+    this.scoringSystem = new ScoringSystem(/*...*/);
+    // ... 10+ more managers
+    
+    // Game state mixed with UI state
+    this.score = 0;
+    this.level = 1;
+    this.isDragging = false;
+    this.selectedBlock = null;
+    
+    // Canvas operations mixed with game logic
+    this.canvas = document.getElementById('game-board');
+    this.ctx = this.canvas.getContext('2d');
+  }
+  
+  // 3,700+ lines of mixed concerns
+  placeBlock() { /* game logic + UI updates + sound + effects */ }
+  updateUI() { /* everything touches everything */ }
+  drawBoard() { /* rendering mixed with state */ }
+}
+```
+
+**Problems This Creates:**
+- 🔴 **Untestable** - Can't test game logic without DOM
+- 🔴 **Unmaintainable** - Every feature touches the same file
+- 🔴 **Merge Conflicts** - All developers modify the same 3,741 lines
+- 🔴 **Circular Dependencies** - Everything depends on everything
+- 🔴 **Performance Issues** - No lazy loading, everything instantiated at once
+- 🔴 **Debug Complexity** - Hard to isolate issues
+- 🔴 **Scaling Problems** - Adding features becomes exponentially harder
+
+### **✅ The Refactored PWA Architecture**
+
+#### **Separation of Concerns Pattern**
+```
+PWAApp (Orchestrator - 200 lines)
+├── GameEngine (Pure Logic - 500 lines)
+│   ├── Block placement logic
+│   ├── Line clearing algorithms  
+│   ├── Scoring calculations
+│   └── Game state transitions
+│
+├── UIManager (DOM Interaction - 400 lines)
+│   ├── Canvas rendering
+│   ├── Event handling
+│   ├── Animation management
+│   └── Visual feedback
+│
+├── StateManager (Data Management - 200 lines)
+│   ├── Game state persistence
+│   ├── Settings synchronization
+│   ├── Storage management
+│   └── State change notifications
+│
+└── DependencyContainer (IoC - 100 lines)
+    ├── Manager registration
+    ├── Dependency resolution
+    ├── Lifecycle management
+    └── Testing support
+```
+
+#### **Key Architectural Principles**
+
+**1. Separation of Concerns**
+> Each component should have a single, well-defined responsibility.
+
+```javascript
+// ✅ GOOD - Pure business logic
+class GameEngine {
+  placeBlock(block, position) {
+    // Pure game logic only
+    const result = this.validatePlacement(block, position);
+    if (!result.valid) return result;
+    
+    this.applyBlockToBoard(block, position);
+    const scoreGained = this.calculateScore(block);
+    this.updateGameState(scoreGained);
+    
+    return {
+      success: true,
+      scoreGained,
+      newGameState: this.getState(),
+      clearedLines: result.clearedLines
+    };
+  }
+}
+
+// ✅ GOOD - Pure UI logic
+class UIManager {
+  updateScore(newScore, animation = true) {
+    const scoreElement = this.elements.score;
+    if (animation) {
+      this.animateScoreChange(scoreElement, newScore);
+    } else {
+      scoreElement.textContent = newScore;
+    }
+  }
+  
+  render(gameState) {
+    // Declarative rendering based on state
+    this.updateScore(gameState.score);
+    this.updateLevel(gameState.level);
+    this.renderBoard(gameState.board);
+    this.updateBlockPalette(gameState.availableBlocks);
+  }
+}
+```
+
+**2. Dependency Inversion**
+> Depend on abstractions, not concretions. Inject dependencies rather than creating them.
+
+```javascript
+// ✅ GOOD - Dependency injection
+class GameEngine {
+  constructor(dependencies) {
+    this.storage = dependencies.storage;
+    this.audio = dependencies.audio;
+    // No direct imports - all injected
+  }
+}
+
+// ✅ GOOD - Dependency container
+class DependencyContainer {
+  constructor() {
+    this.services = new Map();
+    this.registerServices();
+  }
+  
+  registerServices() {
+    this.services.set('storage', new StorageManager());
+    this.services.set('audio', new AudioManager());
+    this.services.set('gameEngine', new GameEngine({
+      storage: this.services.get('storage'),
+      audio: this.services.get('audio')
+    }));
+  }
+  
+  resolve(serviceName) {
+    return this.services.get(serviceName);
+  }
+}
+```
+
+**3. Single Source of Truth**
+> All state should live in one place and flow down through the application.
+
+```javascript
+// ✅ GOOD - Centralized state management
+class StateManager {
+  constructor() {
+    this.gameState = new GameState();
+    this.uiState = new UIState();
+    this.settings = new Settings();
+    this.observers = new Map();
+  }
+  
+  updateGameState(changes) {
+    const oldState = { ...this.gameState };
+    Object.assign(this.gameState, changes);
+    this.notifyObservers('gameState', this.gameState, oldState);
+    this.persistGameState();
+  }
+  
+  subscribe(stateType, callback) {
+    // Observer pattern for state changes
+    if (!this.observers.has(stateType)) {
+      this.observers.set(stateType, []);
+    }
+    this.observers.get(stateType).push(callback);
+  }
+}
+```
+
+**4. Event-Driven Architecture**
+> Components should communicate through events, not direct method calls.
+
+```javascript
+// ✅ GOOD - Event-driven communication
+class GameEngine {
+  placeBlock(block, position) {
+    const result = this.validateAndPlace(block, position);
+    
+    // Emit event instead of direct UI update
+    this.emit('blockPlaced', {
+      block,
+      position,
+      result,
+      newGameState: this.getState()
+    });
+    
+    return result;
+  }
+}
+
+class UIManager {
+  constructor(gameEngine) {
+    // Listen to game events
+    gameEngine.on('blockPlaced', (event) => {
+      this.updateScore(event.result.scoreGained);
+      this.renderBoard(event.newGameState.board);
+      this.showPlacementFeedback(event.block, event.position);
+    });
+  }
+}
+```
+
+### **PWA Design Patterns**
+
+#### **1. Observer Pattern for State**
+```javascript
+// Decoupled state updates
+stateManager.subscribe('score', (newScore) => {
+  uiManager.updateScore(newScore);
+  audioManager.playScoreSound();
+});
+```
+
+**Benefits:**
+- ✅ Loose coupling
+- ✅ Easy to add new observers
+- ✅ Event-driven architecture
+
+#### **2. Command Pattern for Actions**
+```javascript
+// Undoable actions
+class PlaceBlockCommand {
+  constructor(gameEngine, block, position) {
+    this.gameEngine = gameEngine;
+    this.block = block;
+    this.position = position;
+  }
+  
+  execute() {
+    return this.gameEngine.placeBlock(this.block, this.position);
+  }
+  
+  undo() {
+    return this.gameEngine.removeBlock(this.block, this.position);
+  }
+}
+```
+
+**Benefits:**
+- ✅ Undo/redo functionality
+- ✅ Action queuing
+- ✅ Macro commands
+
+#### **3. Factory Pattern for Components**
+```javascript
+// Consistent component creation
+class ComponentFactory {
+  constructor() {
+    this.managers = new Map();
+    this.registerManagers();
+  }
+  
+  createManager(type, dependencies) {
+    const Manager = this.managers.get(type);
+    return new Manager(dependencies);
+  }
+}
+```
+
+**Benefits:**
+- ✅ Consistent initialization
+- ✅ Easy to extend
+- ✅ Configuration management
+
+### **Architecture Red Flags**
+
+Watch for these warning signs in PWA architecture:
+
+- 🚨 **Any file over 1,000 lines**
+- 🚨 **Business logic mixed with DOM manipulation**
+- 🚨 **Circular dependencies between components**
+- 🚨 **Global state accessed directly**
+- 🚨 **Untestable code (requires full DOM setup)**
+- 🚨 **Constructor side effects**
+- 🚨 **Tight coupling between unrelated features**
+
+### **PWA Architecture Checklist**
+
+#### **Before Starting Development:**
+- [ ] Design component boundaries upfront
+- [ ] Plan dependency injection from day one
+- [ ] Separate business logic from UI logic
+- [ ] Design state management strategy
+- [ ] Plan testing strategy (unit + integration)
+
+#### **During Development:**
+- [ ] Keep components under 500 lines
+- [ ] Write tests for business logic first
+- [ ] Use dependency injection for all external dependencies
+- [ ] Implement observer pattern for state changes
+- [ ] Regular architectural reviews
 
 ---
 
@@ -466,6 +778,182 @@ addHapticFeedback() {
 - **Progressive enhancement**: Haptic feedback is nice-to-have, not essential
 - **Async execution**: Use `setTimeout(0)` to prevent blocking main thread
 - **Silent failure**: Don't log errors for expected browser security blocks
+
+### PWA Performance Patterns from Real Refactoring
+
+#### **Performance Transformation Results**
+- **Before Refactoring**: 2-3 second initialization, high memory usage, large bundle size
+- **After Refactoring**: <1 second initialization, optimized memory, smaller bundle size
+
+#### **1. Lazy Loading Pattern**
+```javascript
+// Load managers only when needed
+class PWAApp {
+  constructor() {
+    this.features = new Map();
+  }
+  
+  async loadGameFeature(featureName) {
+    if (!this.features.has(featureName)) {
+      const module = await import(`./features/${featureName}.js`);
+      this.features.set(featureName, new module.default());
+    }
+    return this.features.get(featureName);
+  }
+  
+  async initialize() {
+    // Load only critical features immediately
+    await this.loadGameFeature('core');
+    
+    // Load optional features on demand
+    this.setupLazyLoading();
+  }
+  
+  setupLazyLoading() {
+    // Load features when user interacts with them
+    document.getElementById('settings-btn').addEventListener('click', async () => {
+      const settingsManager = await this.loadGameFeature('settings');
+      settingsManager.show();
+    });
+  }
+}
+```
+
+**Benefits:**
+- ✅ **Faster Initial Load** - Only critical code loads immediately
+- ✅ **Reduced Memory Usage** - Features loaded only when needed
+- ✅ **Better User Experience** - App appears to load faster
+- ✅ **Smaller Initial Bundle** - Tree shaking works better
+
+#### **2. Object Pooling Pattern**
+```javascript
+// Reuse objects instead of creating new ones
+class ParticlePool {
+  constructor(size = 100) {
+    this.pool = Array(size).fill(null).map(() => new Particle());
+    this.available = [...this.pool];
+  }
+  
+  acquire() {
+    return this.available.pop() || new Particle();
+  }
+  
+  release(particle) {
+    particle.reset();
+    this.available.push(particle);
+  }
+}
+
+// Usage in effects manager
+class EffectsManager {
+  constructor() {
+    this.particlePool = new ParticlePool(200);
+  }
+  
+  createExplosion(position) {
+    const particles = [];
+    for (let i = 0; i < 20; i++) {
+      const particle = this.particlePool.acquire();
+      particle.initialize(position);
+      particles.push(particle);
+    }
+    return particles;
+  }
+  
+  cleanupExplosion(particles) {
+    particles.forEach(particle => {
+      this.particlePool.release(particle);
+    });
+  }
+}
+```
+
+**Benefits:**
+- ✅ **Reduced Garbage Collection** - Fewer object allocations
+- ✅ **Consistent Performance** - No memory spikes during effects
+- ✅ **Memory Efficiency** - Reuse objects instead of creating new ones
+
+#### **3. Event Delegation Pattern**
+```javascript
+// Single event listener instead of many
+class UIManager {
+  constructor(container) {
+    this.container = container;
+    this.setupEventDelegation();
+  }
+  
+  setupEventDelegation() {
+    // Single event listener for all interactions
+    this.container.addEventListener('click', (e) => {
+      const handler = this.getHandler(e.target);
+      if (handler) handler(e);
+    });
+    
+    this.container.addEventListener('touchstart', (e) => {
+      const handler = this.getTouchHandler(e.target);
+      if (handler) handler(e);
+    });
+  }
+  
+  getHandler(element) {
+    // Find the appropriate handler based on element
+    if (element.matches('.block-palette .block')) {
+      return this.handleBlockSelection.bind(this);
+    }
+    if (element.matches('.game-board .cell')) {
+      return this.handleCellClick.bind(this);
+    }
+    if (element.matches('.settings-btn')) {
+      return this.handleSettingsClick.bind(this);
+    }
+    return null;
+  }
+}
+```
+
+**Benefits:**
+- ✅ **Better Performance** - Fewer event listeners
+- ✅ **Dynamic Content** - Works with dynamically added elements
+- ✅ **Memory Efficiency** - Single listener instead of many
+- ✅ **Easier Management** - Centralized event handling
+
+#### **4. Mobile Performance Optimization**
+```javascript
+// Throttled updates for mobile
+class GameLoop {
+  constructor() {
+    this.isMobile = this.detectMobile();
+    this.targetFPS = this.isMobile ? 30 : 60;
+    this.frameTime = 1000 / this.targetFPS;
+    this.lastFrame = 0;
+  }
+  
+  detectMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  }
+  
+  start() {
+    this.loop();
+  }
+  
+  loop(currentTime = 0) {
+    const deltaTime = currentTime - this.lastFrame;
+    
+    if (deltaTime >= this.frameTime) {
+      this.update(deltaTime);
+      this.render();
+      this.lastFrame = currentTime;
+    }
+    
+    requestAnimationFrame((time) => this.loop(time));
+  }
+}
+```
+
+**Benefits:**
+- ✅ **Battery Life** - Lower frame rate on mobile saves battery
+- ✅ **Smooth Performance** - Consistent frame rate across devices
+- ✅ **Adaptive** - Automatically adjusts to device capabilities
 
 ### Build Asset Management
 
