@@ -1,7 +1,7 @@
 {
-  "name": "PWA Template - Best Practices",
-  "short_name": "PWA Template",
-  "description": "A comprehensive PWA template with all best practices learned from multiple projects",
+  "name": "Pea's with Answers - PWA Best Practices",
+  "short_name": "Pea's with Answers",
+  "description": "Your go-to resource for PWA best practices, learned from building multiple Progressive Web Apps",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

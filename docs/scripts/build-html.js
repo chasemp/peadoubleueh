@@ -11,7 +11,7 @@ const crypto = require('crypto');
 
 // Build configuration
 const config = {
-  currentDir: '.',
+  currentDir: process.cwd(),
   version: process.env.npm_package_version || '1.0.0',
   buildTime: new Date().toISOString(),
   commit: process.env.GITHUB_SHA || 'local',
@@ -22,6 +22,11 @@ console.log('🔨 Building PWA Template...');
 console.log(`Version: ${config.version}`);
 console.log(`Build Time: ${config.buildTime}`);
 console.log(`Commit: ${config.commit}`);
+
+// Ensure current directory exists
+if (!fs.existsSync(config.currentDir)) {
+  fs.mkdirSync(config.currentDir, { recursive: true });
+}
 
 // Read source HTML
 const htmlPath = path.join(config.currentDir, 'index.html');

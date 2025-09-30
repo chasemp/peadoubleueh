@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PWA Template - Best Practices (v1.0.0)</title>
+  <title>Pea's with Answers - PWA Best Practices</title>
   
   <!-- PWA Manifest -->
   <link rel="manifest" href="manifest.json">
@@ -12,14 +12,15 @@
   <meta name="theme-color" content="#2196F3">
   
   <!-- Apple Touch Icon -->
-  <link rel="apple-touch-icon" href="assets/icon-192x192.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   
   <!-- Favicon -->
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
   
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/styles.css?v=09fcb80a">
+  <link rel="stylesheet" href="css/styles.css?v=edf867ff">
   
   <!-- Critical CSS Inline for Performance -->
   <style>
@@ -54,7 +55,13 @@
   <!-- Main App Structure -->
   <header class="header">
     <div class="header-content">
-      <h1>PWA Template</h1>
+      <div class="logo-section">
+        <img src="assets/logo.svg" alt="Pea's with Answers" class="logo" width="40" height="40">
+        <div class="brand">
+          <h1>Pea's with Answers</h1>
+          <p class="tagline">PWA Best Practices</p>
+        </div>
+      </div>
       <div class="header-actions">
         <button id="theme-toggle" class="btn btn-icon" aria-label="Toggle theme">🌙</button>
         <button id="settings-btn" class="btn btn-icon" aria-label="Settings">⚙️</button>
@@ -72,8 +79,9 @@
     <!-- Main Content -->
     <div id="content" class="content" style="display: none;">
       <section class="hero">
-        <h2>Welcome to PWA Template</h2>
-        <p>This template includes all the best practices we've learned from building multiple PWAs.</p>
+        <h2>Welcome to Pea's with Answers</h2>
+        <p>Your go-to resource for PWA best practices, learned from building multiple Progressive Web Apps.</p>
+        <p class="subtitle">🌱 Growing better PWAs, one lesson at a time</p>
       </section>
 
       <section class="features">
@@ -95,16 +103,6 @@
             <h4>🎨 Theme Support</h4>
             <p>Light/dark theme with system preference detection</p>
           </div>
-        </div>
-      </section>
-
-      <section class="build-info">
-        <h3>Build Information</h3>
-        <div class="build-details">
-          <p><strong>Version:</strong> 1.0.0</p>
-          <p><strong>Build Time:</strong> 2025-09-30T18:58:41.581Z</p>
-          <p><strong>Commit:</strong> local</p>
-          <p><strong>Branch:</strong> local</p>
         </div>
       </section>
 

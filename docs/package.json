@@ -7,7 +7,7 @@
     "dev": "npx serve src -p 3000",
     "build": "npm run build:html",
     "build:html": "node scripts/build-html.js",
-    "preview": "npx serve . -p 3001",
+    "preview": "npx serve docs -p 3001",
     "deploy": "npm run build && git add docs/ && git commit -m 'Build for production' && git push",
     "test": "echo 'No tests specified' && exit 0"
   },
