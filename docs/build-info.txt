@@ -1,0 +1,8 @@
+PWA Template Build Info
+=======================
+Version: 1.0.0
+Build Time: 2025-09-30T18:58:41.581Z
+Commit: local
+Branch: local
+CSS Hash: 09fcb80a
+JS Hash: e8a7bc6e
