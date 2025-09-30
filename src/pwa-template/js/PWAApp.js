@@ -12,6 +12,7 @@ class PWAApp {
     this.performanceMonitor = new PerformanceMonitor();
     this.cacheBustingManager = new CacheBustingManager();
     this.serviceWorkerManager = new ServiceWorkerManager();
+    this.demoDataManager = new DemoDataManager(this.platformAPI, this.storageManager);
     
     // Configuration
     this.config = {
@@ -42,6 +43,9 @@ class PWAApp {
       
       // Initialize UI
       this.initializeUI();
+      
+      // Initialize demo data (if needed)
+      await this.initializeDemoData();
       
       // Show content after initialization
       this.showContent();
@@ -193,6 +197,42 @@ class PWAApp {
     }
   }
 
+  /**
+   * Initialize demo data from platform
+   * Implements platform-generated demo data pattern
+   */
+  async initializeDemoData() {
+    try {
+      // Check if demo mode is enabled
+      const isDemoMode = this.storageManager.getData('demo_mode') === 'true';
+      
+      if (!isDemoMode) {
+        console.log('📊 Demo mode disabled, skipping demo data initialization');
+        return;
+      }
+
+      console.log('📊 Initializing demo data from platform...');
+      
+      // Load demo data from platform
+      const demoData = await this.demoDataManager.loadDemoData();
+      
+      // Store demo data in app state
+      this.demoData = demoData;
+      
+      // Notify that demo data is ready
+      this.notifyDemoDataReady(demoData);
+      
+      console.log('✅ Demo data initialized successfully');
+      
+    } catch (error) {
+      console.error('❌ Failed to initialize demo data:', error);
+      
+      // Don't throw error - demo data is optional
+      // Just log the error and continue
+      console.log('📊 Continuing without demo data');
+    }
+  }
+
   showContent() {
     // Hide loading state
     const loading = document.getElementById('loading');
@@ -204,6 +244,44 @@ class PWAApp {
     const content = document.getElementById('content');
     if (content) {
       content.style.display = 'block';
+    }
+  }
+
+  /**
+   * Notify that demo data is ready
+   * This can be used to update UI with demo data
+   */
+  notifyDemoDataReady(demoData) {
+    console.log('📊 Demo data ready:', demoData);
+    
+    // Dispatch custom event for demo data ready
+    const event = new CustomEvent('demoDataReady', {
+      detail: { demoData }
+    });
+    document.dispatchEvent(event);
+    
+    // Update UI with demo data if needed
+    this.updateUIWithDemoData(demoData);
+  }
+
+  /**
+   * Update UI with demo data
+   * This is where you would populate UI elements with demo data
+   */
+  updateUIWithDemoData(demoData) {
+    // Example: Update demo data display
+    const demoStats = this.demoDataManager.getDemoDataStats();
+    if (demoStats) {
+      console.log('📊 Demo data stats:', demoStats);
+      
+      // Update demo data info in UI
+      const demoInfo = document.getElementById('demo-info');
+      if (demoInfo) {
+        demoInfo.innerHTML = `
+          <p>Demo Data: ${demoStats.userCount} users, ${demoStats.projectCount} projects, ${demoStats.taskCount} tasks</p>
+          <p>Last updated: ${demoStats.lastRefresh} hours ago</p>
+        `;
+      }
     }
   }
 

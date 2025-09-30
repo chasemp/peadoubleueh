@@ -390,6 +390,14 @@ addTouchSupport(button, () => {
 - **Use relative paths for all assets** - absolute paths break on GitHub Pages
 - **Choose one deployment method** - don't mix branch deployment with GitHub Actions
 
+### **Demo Data Generation**
+- **Use platform to generate demo data** - Never create separate demo data scripts
+- **Export from production platform** - Use actual platform APIs to generate data
+- **Anonymize sensitive data** - Remove PII but keep structure intact
+- **Cache demo data locally** - For offline functionality
+- **Refresh from platform** - Keep demo data current with platform changes
+- **Avoid synthetic generators** - They diverge from real platform behavior
+
 ---
 
 ## 🔗 Related Guides
