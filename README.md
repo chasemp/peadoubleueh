@@ -14,7 +14,7 @@ npm install
 
 # Start development server
 npm run dev
-# → Opens at http://localhost:3000
+# → Opens at http://localhost:3456
 
 # Build for production
 npm run build
@@ -185,10 +185,16 @@ npm run preview    # Test production build locally
 
 ## 📚 Learn More
 
-- **Architecture:** `project-docs/DEPLOYMENT_ARCHITECTURE.md`
-- **Workflow:** `project-docs/PWA_DEVELOPMENT_WORKFLOW.md`
-- **Lessons Learned:** `project-docs/PWA_DEVELOPMENT_LESSONS.md`
-- **Quick Reference:** `project-docs/PWA_QUICK_REFERENCE.md`
+### **New to PWAs?**
+- **[Getting Started Guide](project-docs/GETTING_STARTED.md)** ⭐ - Complete beginner walkthrough
+
+### **Documentation Library:**
+- **[PWA Guide Index](project-docs/PWA_DEVELOPMENT_LESSONS.md)** - Choose your learning path
+- **[Quick Reference](project-docs/PWA_QUICK_REFERENCE.md)** - Code patterns and snippets
+- **[Deployment Architecture](project-docs/DEPLOYMENT_ARCHITECTURE.md)** - Build system deep dive
+- **[Development Workflow](project-docs/PWA_DEVELOPMENT_WORKFLOW.md)** - Testing and processes
+- **[Mobile UX Guide](project-docs/PWA_MOBILE_UX_GUIDE.md)** - Mobile-first design
+- **[PWA Resources](project-docs/PWA_RESOURCES.md)** - External tools and learning materials
 
 ---
 
