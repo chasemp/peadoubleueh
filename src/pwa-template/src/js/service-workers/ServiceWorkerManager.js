@@ -386,5 +386,5 @@ class ServiceWorkerManager {
   }
 }
 
-// Make ServiceWorkerManager globally available
-window.ServiceWorkerManager = ServiceWorkerManager;
+// Export as ES module
+export default ServiceWorkerManager;

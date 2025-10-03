@@ -327,5 +327,5 @@ class StorageManager {
   }
 }
 
-// Make StorageManager globally available
-window.StorageManager = StorageManager;
+// Export as ES module
+export default StorageManager;

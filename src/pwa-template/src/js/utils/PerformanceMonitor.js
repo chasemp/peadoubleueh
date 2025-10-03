@@ -420,5 +420,5 @@ class PerformanceMonitor {
   }
 }
 
-// Make PerformanceMonitor globally available
-window.PerformanceMonitor = PerformanceMonitor;
+// Export as ES module
+export default PerformanceMonitor;

@@ -374,5 +374,5 @@ class NotificationManager {
   }
 }
 
-// Make NotificationManager globally available
-window.NotificationManager = NotificationManager;
+// Export as ES module
+export default NotificationManager;

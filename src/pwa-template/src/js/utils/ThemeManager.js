@@ -253,5 +253,5 @@ class ThemeManager {
   }
 }
 
-// Make ThemeManager globally available
-window.ThemeManager = ThemeManager;
+// Export as ES module
+export default ThemeManager;

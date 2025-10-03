@@ -3,6 +3,14 @@
  * Integrates all best practices learned from multiple PWA projects
  */
 
+import StorageManager from './utils/StorageManager.js';
+import ThemeManager from './utils/ThemeManager.js';
+import NotificationManager from './utils/NotificationManager.js';
+import PerformanceMonitor from './utils/PerformanceMonitor.js';
+import CacheBustingManager from './strategies/CacheBustingManager.js';
+import ServiceWorkerManager from './service-workers/ServiceWorkerManager.js';
+import DemoDataManager from './utils/DemoDataManager.js';
+
 class PWAApp {
   constructor() {
     this.isInitialized = false;
