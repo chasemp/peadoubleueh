@@ -103,6 +103,92 @@ This comprehensive guide was compiled from lessons learned during the developmen
 - **BustAGroove PWA** - Music game with local library dependencies
 - **MealPlanner PWA** - Data-heavy app with testing strategies
 
+### **🔄 Major Refactoring Case Study: Blockdoku PWA**
+
+**The Challenge:** Transform a 3,741-line monolithic PWA into a clean, modular architecture while maintaining 100% behavioral compatibility.
+
+**The Solution:** Testing-first refactoring with comprehensive test coverage (66 tests, 100% pass rate).
+
+**Key Achievements:**
+- **89% Code Reduction** - From 3,741 to 400 lines in main app file
+- **Zero Breaking Changes** - All original functionality preserved
+- **Modular Architecture** - 4 focused, testable components
+- **Complete Test Coverage** - Characterization, unit, and integration tests
+
+**Lessons Learned:**
+- **Testing Foundation is Critical** - 66 tests made refactoring possible
+- **Characterization Tests First** - Capture current behavior before changes
+- **Component-by-Component Extraction** - One component at a time with tests
+- **Dependency Injection Enables Testing** - Makes components testable and flexible
+- **State Management Centralization** - Single source of truth for all state
+
+**Detailed Documentation:**
+- **[Technical Implementation Guide](./PWA_TECHNICAL_IMPLEMENTATION.md#pwa-refactoring-from-monolith-to-modular-architecture)** - Complete refactoring case study
+- **[Development Workflow Guide](./PWA_DEVELOPMENT_WORKFLOW.md#testing-strategy-for-pwa-refactoring)** - Testing strategies for safe refactoring
+
+---
+
+### **🚨 CRITICAL: Source vs Build File Confusion (Oct 2025)**
+
+**The Most Destructive Architectural Issue Across All PWA Projects**
+
+#### The Problem
+The single most damaging mistake made across multiple PWA projects was **mixing source and built files** in the same directory structure.
+
+**Symptoms experienced:**
+- ❌ Weeks lost to circular debugging
+- ❌ Multiple PRs fixing "bugs" that were just stale builds
+- ❌ Developers (human and AI) editing wrong files
+- ❌ Changes mysteriously disappearing  
+- ❌ Live sites serving old content while source was updated
+- ❌ Build timestamps causing endless commit churn
+- ❌ Impossible to know "which file is the latest version"
+
+**Real example from Blockdoku:** PR #92 "Investigate hidden game setting implementation" - Settings weren't visible not because of broken code, but because the deployed built files were stale while source files had the fix.
+
+#### Root Causes
+1. **Unclear Separation** - No obvious distinction between source and built files
+2. **Building to Root** - Vite/build tools configured with `outDir: '../'`
+3. **Manual Build Process** - Easy to forget `npm run build` before committing
+4. **No Protections** - Nothing prevented editing built files
+5. **Documentation Collision** - `/docs` used for project docs instead of builds
+6. **Build Metadata Churn** - Timestamp files changed every build, creating commit noise
+
+#### The Solution: /src → /docs Pattern
+
+**New Architecture (October 2025):**
+```
+your-pwa/
+├── src/          → Source code (EDIT HERE)
+├── docs/         → Built output (AUTO-GENERATED)  
+├── project-docs/ → Project documentation (if needed)
+└── public/       → Static assets
+```
+
+**4 Layers of Protection:**
+1. `.gitattributes` - Marks `/docs` as generated
+2. `.cursorrules` - Warns AI assistants
+3. HTML comments - Warns human developers
+4. Comprehensive documentation
+
+**Pre-commit Hook:** Automates tests + build, prevents forgetting
+
+**Build Metadata Strategy:**
+- Root `build`, `build-info.json` → gitignored (prevent churn)
+- Hook copies them to `/docs` for deployment
+- Only `/docs` versions committed
+- Result: Clean commits, no timestamp noise
+
+**Impact:**
+- **Before:** Constant confusion, lost work, stale deployments
+- **After:** Clear workflow, automatic builds, reliable deployments
+
+**Complete Guide:** See [Development Workflow - Deployment Pattern](./PWA_DEVELOPMENT_WORKFLOW.md#critical-the-src--docs-deployment-pattern)
+
+**This architectural pattern is now mandatory for all new PWA projects.**
+
+---
+
 Each project contributed unique insights that are now consolidated into these specialized guides for future PWA development.
 
 ---

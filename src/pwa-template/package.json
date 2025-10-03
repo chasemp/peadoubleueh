@@ -2,16 +2,13 @@
   "name": "pwa-template",
   "version": "1.0.0",
   "description": "A comprehensive PWA template with all best practices learned from multiple projects",
-  "main": "src/index.html",
+  "type": "module",
   "scripts": {
-    "dev": "npx serve src -p 3000",
-    "build": "npm run clean && npm run build:assets && npm run build:html",
-    "clean": "rm -rf docs/*",
-    "build:assets": "cp -r src/* docs/",
-    "build:html": "node scripts/build-html.js",
-    "preview": "npx serve docs -p 3001",
-    "deploy": "npm run build && git add docs/ && git commit -m 'Build for production' && git push",
-    "test": "echo 'No tests specified' && exit 0"
+    "dev": "vite",
+    "build": "vite build && node scripts/generate-build-info.js",
+    "preview": "vite preview --port 3001",
+    "test": "echo 'No tests specified' && exit 0",
+    "setup-hooks": "node scripts/setup-pre-commit-hook.js"
   },
   "keywords": [
     "pwa",
@@ -23,13 +20,13 @@
   "author": "Your Name",
   "license": "MIT",
   "devDependencies": {
-    "serve": "^14.2.1"
+    "vite": "^5.0.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/pwa-template.git"
+    "url": "https://github.com/chasemp/peadoubleueh.git"
   },
-  "homepage": "https://yourusername.github.io/pwa-template/",
+  "homepage": "https://pea.523.life/",
   "engines": {
     "node": ">=18.0.0"
   }

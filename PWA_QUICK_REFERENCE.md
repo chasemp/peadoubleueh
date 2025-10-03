@@ -10,8 +10,9 @@
 2. [Quick Troubleshooting](#quick-troubleshooting)
 3. [Mobile Touch Events](#mobile-touch-events)
 4. [PWA Setup Checklist](#pwa-setup-checklist)
-5. [Common Mistakes](#common-mistakes)
-6. [Key Takeaways](#key-takeaways)
+5. [Deployment Quick Reference](#deployment-quick-reference)
+6. [Common Mistakes](#common-mistakes)
+7. [Key Takeaways](#key-takeaways)
 
 ---
 
@@ -299,6 +300,110 @@ addTouchSupport(button, () => {
 
 ---
 
+## 🚀 Deployment Quick Reference
+
+### The /src → /docs Pattern (MANDATORY)
+
+**The #1 rule:** Never mix source and built files.
+
+```
+your-pwa/
+├── src/      # ✅ Edit here
+├── docs/     # 🤖 Auto-generated
+└── public/   # Static assets
+```
+
+### 5-Minute Setup
+
+```bash
+# 1. Clone template or create structure
+mkdir -p src public docs
+
+# 2. Configure vite.config.js
+# root: 'src', build.outDir: '../docs'
+
+# 3. Add pre-commit hook
+# Tests + build + stage /docs
+
+# 4. Create protections
+# .gitattributes, .cursorrules, .gitignore
+
+# 5. Configure GitHub Pages
+# Settings → Pages → Branch: main, Folder: /docs
+```
+
+### Daily Workflow
+
+```bash
+# 1. Edit (only in /src!)
+vim src/index.html
+
+# 2. Test locally
+npm run dev
+
+# 3. Commit (hook auto-builds)
+git commit -m "Feature"  # ← Tests & build happen here
+
+# 4. Push
+git push  # → Live in ~2 min
+```
+
+### vite.config.js Template
+
+```javascript
+export default {
+  root: 'src',
+  publicDir: '../public',
+  build: {
+    outDir: '../docs',
+    emptyOutDir: true
+  },
+  server: { port: 3456 }
+}
+```
+
+### Pre-Commit Hook Template
+
+```bash
+#!/bin/bash
+set -e
+npm test
+npm run build --silent
+cp build docs/build
+cp build-info.json docs/build-info.json
+git add docs/
+```
+
+### Quick Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| Working directory not clean after commit | Add `/build`, `/build-info.json` to .gitignore |
+| Live site doesn't match code | Run `npm run build`, check `git status`, commit `/docs` |
+| Pre-commit hook fails | Run `npm run build` to see errors |
+| Git permission errors on /docs | `chmod -R u+w docs/` (don't use read-only protection) |
+
+### Protection Checklist
+
+- [ ] `.gitattributes` marks `/docs` as generated
+- [ ] `.cursorrules` warns AI about `/docs`
+- [ ] HTML comments in built files warn developers
+- [ ] Documentation (QUICK_START.md) explains workflow
+- [ ] `.gitignore` excludes root build artifacts
+- [ ] Pre-commit hook automates build
+- [ ] GitHub Pages set to `/docs` folder
+
+### Success Criteria
+
+✅ Developers only edit `/src`  
+✅ `git status` clean after commits  
+✅ Live site updates within 2 minutes  
+✅ No one asks "which file is latest?"
+
+**Full guide:** [DEPLOYMENT_ARCHITECTURE.md](./DEPLOYMENT_ARCHITECTURE.md)
+
+---
+
 ## ❌ Common Mistakes
 
 ### Touch Events
@@ -316,6 +421,7 @@ addTouchSupport(button, () => {
 - ❌ **Using CDN dependencies** - compromises offline capability
 - ❌ **Not testing module loading** - silent failures break functionality
 - ❌ **Forgetting asset cleanup** - causes repository bloat
+- ❌ **Mixing source and built files** - THE most destructive mistake (use /src → /docs pattern)
 
 ### Mobile UX
 - ❌ **Using modals for complex content on mobile** - creates interaction blockers
@@ -384,11 +490,14 @@ addTouchSupport(button, () => {
 - **Separate development and production outputs** - prevents confusion about current files
 - **Use incremental generation** - speeds up builds for large projects
 
-### **GitHub Pages Deployment**
-- **Use GitHub Actions + `/docs` directory** - most predictable pattern
-- **Keep build artifacts out of git** - use `.gitignore` for `docs/` and `dist/`
+### **GitHub Pages Deployment (UPDATED Oct 2025)**
+- **Use /src → /docs pattern** - mandatory for all new projects
+- **Configure Pages to serve from /docs** - NOT from root or gh-pages branch
+- **Pre-commit hook auto-builds** - never forget to build
+- **Gitignore root build artifacts** - only commit /docs versions
+- **No GitHub Actions needed** - Pages serves /docs directly
 - **Use relative paths for all assets** - absolute paths break on GitHub Pages
-- **Choose one deployment method** - don't mix branch deployment with GitHub Actions
+- **See:** [DEPLOYMENT_ARCHITECTURE.md](./DEPLOYMENT_ARCHITECTURE.md) for complete guide
 
 ### **Demo Data Generation**
 - **Use platform to generate demo data** - Never create separate demo data scripts

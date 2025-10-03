@@ -1,0 +1,6 @@
+# Mark /docs as generated code (GitHub linguist)
+docs/** linguist-generated=true
+
+# Normalize line endings
+docs/** text eol=lf
+
