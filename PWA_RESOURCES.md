@@ -79,6 +79,26 @@ Automated PWA auditing tool
 
 ## 📚 Official Documentation
 
+### **[Google Web.dev - Progressive Web Apps](https://web.dev/explore/progressive-web-apps)** ⭐
+Google's comprehensive PWA learning collection
+
+**Complete curriculum includes:**
+- **Introduction:** What are PWAs? What makes a good PWA?
+- **Installation:** Making PWAs installable, custom install experiences
+- **User Experience:** App-like feel, progressive enhancement
+- **Advanced Topics:** Multi-origin sites, offline UX, app stores
+- **Case Studies:** Real business impact (Clipchamp, Gravit Designer, Rakuten, ZDF)
+
+**Special features:**
+- ✅ [Learn PWA Course](https://web.dev/learn/pwa/) - Complete structured course
+- ✅ Case studies with business metrics (97% growth, 450% retention, 60% conversion)
+- ✅ Up-to-date with latest Chrome features
+- ✅ Practical implementation guides
+
+**Best for:** Complete learning path from beginner to advanced, real business cases
+
+---
+
 ### **[MDN Web Docs - Progressive Web Apps](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps)**
 Comprehensive PWA documentation from Mozilla
 
@@ -90,19 +110,6 @@ Comprehensive PWA documentation from Mozilla
 - Best practices
 
 **Best for:** In-depth API references and browser compatibility tables
-
----
-
-### **[Google Web.dev - Progressive Web Apps](https://web.dev/progressive-web-apps/)**
-Google's PWA learning path
-
-**Includes:**
-- PWA training courses
-- Case studies
-- Performance optimization
-- Best practices from Chrome team
-
-**Best for:** Step-by-step tutorials and modern patterns
 
 ---
 
@@ -224,11 +231,28 @@ O'Reilly's definitive PWA guide.
 
 ### **Courses**
 
-**[Progressive Web Apps (PWAs) - The Complete Guide](https://www.udemy.com/course/progressive-web-app-pwa-the-complete-guide/)** (Udemy)
-13-hour comprehensive PWA course.
+**[Learn PWA](https://web.dev/learn/pwa/)** by Google ⭐ **FREE**
+Google's official comprehensive PWA course
 
-**[Google's PWA Training](https://web.dev/learn/pwa/)**
-Free official training from Google.
+**Course structure:**
+- 22 modules covering everything from basics to advanced
+- Progressive enhancement strategies
+- Service workers deep dive
+- Caching strategies and offline patterns
+- Installation and app-like experiences
+- Platform-specific features
+- Testing and debugging
+
+**Why it's excellent:**
+- ✅ Free and official
+- ✅ Up-to-date with latest standards
+- ✅ Interactive examples
+- ✅ From the Chrome team
+
+---
+
+**[Progressive Web Apps (PWAs) - The Complete Guide](https://www.udemy.com/course/progressive-web-app-pwa-the-complete-guide/)** (Udemy)
+13-hour comprehensive video course with hands-on projects.
 
 ---
 
@@ -275,6 +299,42 @@ Travel booking PWA.
 
 ---
 
+### **Case Studies with Business Impact**
+
+From [web.dev PWA case studies](https://web.dev/explore/progressive-web-apps):
+
+**[Clipchamp Video Editor](https://web.dev/case-studies/clipchamp)**
+- 97% monthly growth in PWA installs
+- Video editing entirely in browser
+- Deprecated Electron app in favor of PWA
+
+**[Gravit Designer](https://web.dev/case-studies/gravit-designer)**
+- PWA users 2.5x more likely to purchase PRO version
+- Vector design tool as PWA
+- Better conversion than native app
+
+**[Rakuten 24](https://web.dev/case-studies/rakuten)**
+- 450% increase in user retention
+- Significant improvement in engagement metrics
+- Japanese e-commerce platform
+
+**[JD.ID](https://web.dev/case-studies/jd)**
+- 53% improvement in mobile conversion rate
+- Caching strategies + installation + push notifications
+- Indonesian e-commerce
+
+**[Goibibo](https://web.dev/case-studies/goibibo)**
+- 60% improvement in conversions
+- Indian travel booking platform
+- Focus on performance and offline
+
+**[ZDF Video Platform](https://web.dev/case-studies/zdf)**
+- German broadcaster's video PWA
+- Offline support + dark mode
+- Accessible media player
+
+---
+
 ## 💬 Community & Support
 
 ### **Forums & Discussion**
@@ -315,6 +375,7 @@ PWA-related repositories.
 
 1. **Before Starting:**
    - [ ] Check [What PWA Can Do Today](https://whatpwacando.today/) for feature support
+   - [ ] Take [Learn PWA Course](https://web.dev/learn/pwa/) from Google (free!)
    - [ ] Review [Our PWA Development Lessons](./project-docs/PWA_DEVELOPMENT_LESSONS.md)
    - [ ] Set up [local testing environment](./project-docs/PWA_DEVELOPMENT_WORKFLOW.md#local-testing-environment-setup)
 
