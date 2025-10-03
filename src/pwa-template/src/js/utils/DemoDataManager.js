@@ -205,6 +205,5 @@ class DemoDataManager {
 }
 
 // Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = DemoDataManager;
-}
+// Export as ES module
+export default DemoDataManager;

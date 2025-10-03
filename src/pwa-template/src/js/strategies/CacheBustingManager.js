@@ -429,5 +429,5 @@ class CacheBustingManager {
   }
 }
 
-// Make CacheBustingManager globally available
-window.CacheBustingManager = CacheBustingManager;
+// Export as ES module
+export default CacheBustingManager;
