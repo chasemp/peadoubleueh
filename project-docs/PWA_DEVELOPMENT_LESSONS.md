@@ -26,6 +26,10 @@ Learn: Multi-tier testing, pre-commit hooks, test isolation, local testing setup
 → Start with **[PWA Technical Implementation](/project-docs/PWA_TECHNICAL_IMPLEMENTATION.md)**  
 Learn: Modular architecture, service workers, state management, refactoring patterns
 
+### **I'm managing multiple PWAs locally**
+→ Start with **[Multi-PWA Port Management](/project-docs/MULTI_PWA_PORT_MANAGEMENT.md)**  
+Learn: Port assignment strategy, conflict prevention, management scripts, best practices
+
 ---
 
 ## 📚 **Complete Guide Descriptions**
@@ -127,6 +131,24 @@ Learn: Modular architecture, service workers, state management, refactoring patt
 
 ---
 
+### **[Multi-PWA Port Management](/project-docs/MULTI_PWA_PORT_MANAGEMENT.md)** (400+ lines)
+*Managing multiple PWA development servers without port conflicts*
+
+**When to use:** Running multiple PWA projects simultaneously, experiencing port conflicts
+
+**Topics:**
+- Port assignment strategy (fixed vs auto-increment)
+- Port registry and documentation
+- Vite configuration for multi-project setup
+- Management scripts (check-ports, kill-port)
+- Troubleshooting port conflicts
+- Best practices for team environments
+- NPM helper scripts for port management
+
+**Best for:** Developers managing multiple PWAs, teams with shared development environments
+
+---
+
 ## 🎯 **Topic-Based Navigation**
 
 ### **Deployment & Build**
@@ -150,6 +172,11 @@ Learn: Modular architecture, service workers, state management, refactoring patt
 ### **Service Workers**
 - **Authoritative:** [Technical Implementation - Service Workers](/project-docs/PWA_TECHNICAL_IMPLEMENTATION.md#pwa-architecture--service-workers)
 - Quick Troubleshooting: [Quick Reference](/project-docs/PWA_QUICK_REFERENCE.md#quick-troubleshooting)
+
+### **Local Development & Port Management**
+- **Authoritative:** [Multi-PWA Port Management](/project-docs/MULTI_PWA_PORT_MANAGEMENT.md)
+- Quick Reference: [PWA Quick Reference - Port Management](/project-docs/PWA_QUICK_REFERENCE.md#multi-pwa-port-management)
+- Setup: [Development Workflow - Local Testing](/project-docs/PWA_DEVELOPMENT_WORKFLOW.md#local-testing-environment-setup)
 
 ---
 

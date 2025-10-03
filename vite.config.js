@@ -91,9 +91,9 @@ export default defineConfig({
     copyProjectDocs()
   ],
   server: {
-    port: 3000,
-    host: '0.0.0.0',
-    strictPort: true
+    port: 3456,        // Registered in PORT_REGISTRY.md
+    host: '0.0.0.0',   // Allow network access
+    strictPort: true   // Fail fast if port is taken (prevents conflicts)
   }
 })
 
