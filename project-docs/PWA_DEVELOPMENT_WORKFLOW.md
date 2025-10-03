@@ -446,6 +446,245 @@ tests/
 4. **Shared Test Data**: Use common fixtures and scenarios
 5. **Clear Reporting**: Separate results for each track with detailed metrics
 
+---
+
+## 🔬 Advanced PWA Patterns from Production Projects
+
+### **Local-First Architecture (fin-web)**
+
+**Pattern:** Complete offline-first PWA with SQLite integration and file system access.
+
+```javascript
+// SQLite WebAssembly Integration
+class LocalFirstPWA {
+    async loadSqlJs() {
+        return new Promise((resolve) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js';
+            script.onload = () => {
+                initSqlJs({ 
+                    locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}` 
+                }).then(() => resolve());
+            };
+            document.head.appendChild(script);
+        });
+    }
+    
+    // File System Access API Integration
+    async loadDatabaseFromFile(file) {
+        const arrayBuffer = await file.arrayBuffer();
+        const SQL = await initSqlJs();
+        this.db = new SQL.Database(new Uint8Array(arrayBuffer));
+    }
+    
+    // IndexedDB Fallback for Persistence
+    async saveToIndexedDB() {
+        const data = this.db.export();
+        const request = indexedDB.open('FinDashboard', 1);
+        // Store binary database data
+    }
+}
+```
+
+**Key Benefits:**
+- ✅ **True Offline Capability** - Works without any network connection
+- ✅ **File System Integration** - Direct database file loading/saving
+- ✅ **Progressive Enhancement** - Falls back to IndexedDB when File System API unavailable
+- ✅ **Desktop-Class Experience** - Full keyboard shortcuts and navigation
+
+### **Web Worker Video Processing (Giffer)**
+
+**Pattern:** Heavy computation offloaded to Web Workers with progress tracking.
+
+```typescript
+// Web Worker Integration for ffmpeg.wasm
+function useFfmpegWorker() {
+    const workerRef = useRef<Worker | null>(null);
+    
+    useEffect(() => {
+        const worker = new Worker(
+            new URL('./workers/ffmpeg.worker.ts', import.meta.url), 
+            { type: 'module' }
+        );
+        workerRef.current = worker;
+        return () => worker.terminate();
+    }, []);
+    
+    const encode = useCallback((opts: {
+        file: ArrayBuffer;
+        startSec: number;
+        endSec: number;
+        fps: number;
+        width: number;
+        quality: 'low' | 'medium' | 'high';
+        onProgress?: (p: WorkerProgress) => void;
+    }): Promise<Uint8Array> => {
+        return new Promise((resolve, reject) => {
+            const worker = workerRef.current;
+            if (!worker) return reject(new Error('Worker not ready'));
+            
+            const handleMessage = (ev: MessageEvent<WorkerEvent>) => {
+                const data = ev.data;
+                if ('ratio' in data) {
+                    opts.onProgress?.(data);
+                    return;
+                }
+                if (data.type === 'done') {
+                    worker.removeEventListener('message', handleMessage);
+                    resolve(data.data);
+                }
+            };
+            
+            worker.addEventListener('message', handleMessage);
+            worker.postMessage({
+                type: 'encode',
+                payload: opts
+            }, [opts.file]);
+        });
+    }, []);
+    
+    return { encode };
+}
+```
+
+**Key Benefits:**
+- ✅ **Non-Blocking UI** - Heavy processing doesn't freeze interface
+- ✅ **Progress Tracking** - Real-time feedback during long operations
+- ✅ **Memory Management** - Worker cleanup prevents memory leaks
+- ✅ **TypeScript Integration** - Full type safety with Web Workers
+
+### **Advanced Cache Busting Research (Alf)**
+
+**Pattern:** Systematic cache busting strategy testing and research methodology.
+
+```javascript
+// Comprehensive Cache Busting Investigation
+class CacheBustingInvestigation {
+    async runAllStrategies() {
+        const strategies = [
+            'serviceWorkerVersionBump',
+            'conditionalRequestBypass', 
+            'cacheSignatureInvalidation',
+            'networkConditionSimulation',
+            'userAgentFingerprintBusting',
+            'manifestFingerprintUpdate'
+        ];
+        
+        const results = new Map();
+        
+        for (const strategy of strategies) {
+            console.log(`🧪 Testing: ${strategy}`);
+            const result = await this.testStrategy(strategy);
+            results.set(strategy, result);
+            
+            // Generate detailed report
+            await this.generateStrategyReport(strategy, result);
+        }
+        
+        return this.generateComprehensiveReport(results);
+    }
+    
+    async testStrategy(strategyName) {
+        const startTime = performance.now();
+        let success = false;
+        let details = {};
+        
+        try {
+            switch (strategyName) {
+                case 'serviceWorkerVersionBump':
+                    success = await this.testServiceWorkerVersionBump();
+                    break;
+                case 'conditionalRequestBypass':
+                    success = await this.testConditionalRequestBypass();
+                    break;
+                // ... other strategies
+            }
+        } catch (error) {
+            details.error = error.message;
+        }
+        
+        return {
+            strategy: strategyName,
+            success,
+            duration: performance.now() - startTime,
+            details,
+            timestamp: new Date().toISOString()
+        };
+    }
+}
+```
+
+**Key Benefits:**
+- ✅ **Scientific Methodology** - Systematic testing of cache strategies
+- ✅ **Comprehensive Reporting** - Detailed analysis with metrics
+- ✅ **Production Validation** - Real-world testing on GitHub Pages
+- ✅ **Strategy Comparison** - Data-driven cache busting decisions
+
+### **Enhanced Mobile Touch Handling (CannonPop)**
+
+**Pattern:** Advanced touch event handling with haptic feedback and visual responses.
+
+```typescript
+// Enhanced Dual Event Handling for Mobile + Desktop
+function addDualEventListener(element: HTMLElement, handler: () => void) {
+    // Desktop mouse events
+    element.addEventListener('click', handler);
+    
+    // Enhanced mobile touch events with better UX
+    element.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        
+        // Add visual feedback for touch
+        element.style.transform = 'scale(0.95)';
+        element.style.transition = 'transform 0.1s ease';
+        
+        // Haptic feedback if supported
+        if (navigator.vibrate) {
+            navigator.vibrate(50);
+        }
+        
+        handler();
+    }, { passive: false });
+    
+    // Touch end cleanup
+    element.addEventListener('touchend', () => {
+        element.style.transform = 'scale(1)';
+    });
+    
+    // Prevent double-tap zoom on mobile
+    element.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+    }, { passive: false });
+}
+
+// PostMessage Communication Pattern
+function sendMessageToGame(data: any) {
+    if (gameIframe && gameIframe.contentWindow) {
+        gameIframe.contentWindow.postMessage(data, '*');
+    }
+}
+
+function handleGameMessage(event: MessageEvent) {
+    if (event.origin !== window.location.origin) return;
+    
+    switch (event.data.event) {
+        case 'gameLoaded':
+            gameLoaded = true;
+            sendSettingsToGame();
+            break;
+        case 'scoreUpdate':
+            updateScore(event.data.score);
+            break;
+    }
+}
+```
+
+**Key Benefits:**
+- ✅ **Enhanced Mobile UX** - Visual feedback, haptic response, zoom prevention
+- ✅ **Cross-Frame Communication** - Secure PostMessage patterns
+- ✅ **Touch Optimization** - Prevents common mobile interaction issues
+- ✅ **Universal Event Handling** - Works across desktop and mobile seamlessly
+
 ### **Real-World Refactoring Success Story**
 
 **Project:** Blockdoku PWA Refactoring

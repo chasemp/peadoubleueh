@@ -250,6 +250,69 @@ test('Settings: Theme change preserves difficulty (REGRESSION)', async () => {
 
 ---
 
+## 🔬 Advanced PWA Patterns
+
+### Local-First Architecture
+```javascript
+// SQLite WebAssembly + File System Access API
+async loadSqlJs() {
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js';
+    // ... initialization
+}
+
+async loadDatabaseFromFile(file) {
+    const arrayBuffer = await file.arrayBuffer();
+    this.db = new SQL.Database(new Uint8Array(arrayBuffer));
+}
+```
+
+### Web Worker Heavy Processing
+```typescript
+// ffmpeg.wasm in Web Worker with progress tracking
+function useFfmpegWorker() {
+    const workerRef = useRef<Worker | null>(null);
+    
+    const encode = useCallback((opts) => {
+        return new Promise((resolve, reject) => {
+            const worker = workerRef.current;
+            worker.postMessage({ type: 'encode', payload: opts }, [opts.file]);
+        });
+    }, []);
+}
+```
+
+### Enhanced Mobile Touch
+```typescript
+// Advanced touch handling with haptic feedback
+function addDualEventListener(element: HTMLElement, handler: () => void) {
+    element.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        element.style.transform = 'scale(0.95)';
+        if (navigator.vibrate) navigator.vibrate(50);
+        handler();
+    }, { passive: false });
+}
+```
+
+### Cache Busting Research
+```javascript
+// Systematic cache strategy testing
+class CacheBustingInvestigation {
+    async runAllStrategies() {
+        const strategies = ['serviceWorkerVersionBump', 'conditionalRequestBypass'];
+        for (const strategy of strategies) {
+            const result = await this.testStrategy(strategy);
+            await this.generateStrategyReport(strategy, result);
+        }
+    }
+}
+```
+
+**Full guide:** [Development Workflow - Advanced PWA Patterns](/project-docs/PWA_DEVELOPMENT_WORKFLOW.md#advanced-pwa-patterns-from-production-projects)
+
+---
+
 ## 🎨 Theming & Color Palettes
 
 ### Choosing Color Palettes
