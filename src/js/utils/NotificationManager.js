@@ -3,6 +3,8 @@
  * Based on lessons learned from multiple PWA projects
  */
 
+import logger from './Logger.js';
+
 class NotificationManager {
   constructor() {
     this.permission = 'default';
@@ -14,7 +16,7 @@ class NotificationManager {
   async initialize() {
     if (this.isInitialized || !this.isSupported) return;
     
-    console.log('🔔 Initializing Notification Manager...');
+    logger.log('🔔 Initializing Notification Manager...');
     
     try {
       // Check current permission status
@@ -24,9 +26,9 @@ class NotificationManager {
       this.setupEventListeners();
       
       this.isInitialized = true;
-      console.log('✅ Notification Manager initialized successfully');
+      logger.log('✅ Notification Manager initialized successfully');
     } catch (error) {
-      console.error('❌ Failed to initialize Notification Manager:', error);
+      logger.error('❌ Failed to initialize Notification Manager:', error);
       throw error;
     }
   }
@@ -45,7 +47,7 @@ class NotificationManager {
 
   async requestPermission() {
     if (!this.isSupported) {
-      console.warn('Notifications not supported in this browser');
+      logger.warn('Notifications not supported in this browser');
       return false;
     }
 
@@ -58,27 +60,27 @@ class NotificationManager {
       this.permission = permission;
       
       if (permission === 'granted') {
-        console.log('✅ Notification permission granted');
+        logger.log('✅ Notification permission granted');
         this.notifyPermissionChange();
         return true;
       } else {
-        console.log('❌ Notification permission denied');
+        logger.log('❌ Notification permission denied');
         return false;
       }
     } catch (error) {
-      console.error('Failed to request notification permission:', error);
+      logger.error('Failed to request notification permission:', error);
       return false;
     }
   }
 
   async show(title, options = {}) {
     if (!this.isSupported) {
-      console.warn('Notifications not supported');
+      logger.warn('Notifications not supported');
       return null;
     }
 
     if (this.permission !== 'granted') {
-      console.warn('Notification permission not granted');
+      logger.warn('Notification permission not granted');
       return null;
     }
 
@@ -114,7 +116,7 @@ class NotificationManager {
 
       // Set up error handler
       notification.onerror = (error) => {
-        console.error('Notification error:', error);
+        logger.error('Notification error:', error);
         this.handleNotificationError(notification, error);
       };
 
@@ -125,10 +127,10 @@ class NotificationManager {
         }, 5000);
       }
 
-      console.log('🔔 Notification shown:', title);
+      logger.log('🔔 Notification shown:', title);
       return notification;
     } catch (error) {
-      console.error('Failed to show notification:', error);
+      logger.error('Failed to show notification:', error);
       return null;
     }
   }
@@ -202,7 +204,7 @@ class NotificationManager {
 
   // Event Handlers
   handleNotificationClick(notification, event) {
-    console.log('🔔 Notification clicked:', notification.tag);
+    logger.log('🔔 Notification clicked:', notification.tag);
     
     const action = event.action || 'default';
     const data = notification.data || {};
@@ -217,7 +219,7 @@ class NotificationManager {
           notification
         });
       } catch (error) {
-        console.error('Error in notification callback:', error);
+        logger.error('Error in notification callback:', error);
       }
     });
     
@@ -240,7 +242,7 @@ class NotificationManager {
   }
 
   handleNotificationClose(notification) {
-    console.log('🔔 Notification closed:', notification.tag);
+    logger.log('🔔 Notification closed:', notification.tag);
     
     this.notificationCallbacks.forEach(callback => {
       try {
@@ -250,13 +252,13 @@ class NotificationManager {
           notification
         });
       } catch (error) {
-        console.error('Error in notification callback:', error);
+        logger.error('Error in notification callback:', error);
       }
     });
   }
 
   handleNotificationError(notification, error) {
-    console.error('🔔 Notification error:', error);
+    logger.error('🔔 Notification error:', error);
     
     this.notificationCallbacks.forEach(callback => {
       try {
@@ -267,7 +269,7 @@ class NotificationManager {
           notification
         });
       } catch (error) {
-        console.error('Error in notification callback:', error);
+        logger.error('Error in notification callback:', error);
       }
     });
   }
@@ -306,7 +308,7 @@ class NotificationManager {
           permission: this.permission
         });
       } catch (error) {
-        console.error('Error in notification callback:', error);
+        logger.error('Error in notification callback:', error);
       }
     });
   }

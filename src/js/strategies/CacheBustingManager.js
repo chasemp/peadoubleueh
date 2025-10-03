@@ -3,6 +3,8 @@
  * Based on comprehensive research from Alf project and lessons learned
  */
 
+import logger from '../utils/Logger.js';
+
 class CacheBustingManager {
   constructor() {
     this.strategies = {
@@ -36,7 +38,7 @@ class CacheBustingManager {
   async initialize() {
     if (this.isInitialized) return;
     
-    console.log('🔄 Initializing Cache Busting Manager...');
+    logger.log('🔄 Initializing Cache Busting Manager...');
     
     try {
       // Set up periodic update checks
@@ -51,9 +53,9 @@ class CacheBustingManager {
       this.setupFingerprintBusting();
       
       this.isInitialized = true;
-      console.log('✅ Cache Busting Manager initialized successfully');
+      logger.log('✅ Cache Busting Manager initialized successfully');
     } catch (error) {
-      console.error('❌ Failed to initialize Cache Busting Manager:', error);
+      logger.error('❌ Failed to initialize Cache Busting Manager:', error);
       throw error;
     }
   }
@@ -74,7 +76,7 @@ class CacheBustingManager {
       try {
         callback(event);
       } catch (error) {
-        console.error('Error in update prompt callback:', error);
+        logger.error('Error in update prompt callback:', error);
       }
     });
   }
@@ -85,7 +87,7 @@ class CacheBustingManager {
       return { success: false, reason: 'Strategy disabled' };
     }
 
-    console.log('🔄 Executing Service Worker Version Bump...');
+    logger.log('🔄 Executing Service Worker Version Bump...');
     
     try {
       const currentVersion = this.getCurrentServiceWorkerVersion();
@@ -109,7 +111,7 @@ class CacheBustingManager {
       
       return { success: true, details: { oldVersion: currentVersion, newVersion: newVersion } };
     } catch (error) {
-      console.error('Service Worker Version Bump failed:', error);
+      logger.error('Service Worker Version Bump failed:', error);
       return { success: false, error: error.message };
     }
   }
@@ -120,7 +122,7 @@ class CacheBustingManager {
       return { success: false, reason: 'Strategy disabled' };
     }
 
-    console.log('🔄 Executing Cache Signature Invalidation...');
+    logger.log('🔄 Executing Cache Signature Invalidation...');
     
     try {
       const signatures = {
@@ -138,7 +140,7 @@ class CacheBustingManager {
       
       return { success: true, details: { signatures: signatures } };
     } catch (error) {
-      console.error('Cache Signature Invalidation failed:', error);
+      logger.error('Cache Signature Invalidation failed:', error);
       return { success: false, error: error.message };
     }
   }
@@ -149,7 +151,7 @@ class CacheBustingManager {
       return { success: false, reason: 'Strategy disabled' };
     }
 
-    console.log('🔄 Executing User Agent Fingerprint Busting...');
+    logger.log('🔄 Executing User Agent Fingerprint Busting...');
     
     try {
       const newFingerprint = this.generateNewFingerprint();
@@ -161,7 +163,7 @@ class CacheBustingManager {
       
       return { success: true, details: { fingerprint: newFingerprint } };
     } catch (error) {
-      console.error('User Agent Fingerprint Busting failed:', error);
+      logger.error('User Agent Fingerprint Busting failed:', error);
       return { success: false, error: error.message };
     }
   }
@@ -172,7 +174,7 @@ class CacheBustingManager {
       return { success: false, reason: 'Strategy disabled' };
     }
 
-    console.log('🔄 Executing Conditional Request Bypass...');
+    logger.log('🔄 Executing Conditional Request Bypass...');
     
     try {
       const bypassStrategies = this.generateBypassStrategies();
@@ -184,7 +186,7 @@ class CacheBustingManager {
       
       return { success: true, details: { strategies: bypassStrategies } };
     } catch (error) {
-      console.error('Conditional Request Bypass failed:', error);
+      logger.error('Conditional Request Bypass failed:', error);
       return { success: false, error: error.message };
     }
   }
@@ -195,7 +197,7 @@ class CacheBustingManager {
       return { success: false, reason: 'Strategy disabled' };
     }
 
-    console.log('🔄 Executing Network Condition Simulation...');
+    logger.log('🔄 Executing Network Condition Simulation...');
     
     try {
       const conditions = this.simulateNetworkConditions();
@@ -207,7 +209,7 @@ class CacheBustingManager {
       
       return { success: true, details: { conditions: conditions } };
     } catch (error) {
-      console.error('Network Condition Simulation failed:', error);
+      logger.error('Network Condition Simulation failed:', error);
       return { success: false, error: error.message };
     }
   }
@@ -218,7 +220,7 @@ class CacheBustingManager {
       return { success: false, reason: 'Strategy disabled' };
     }
 
-    console.log('🔄 Executing Manifest Fingerprint Update...');
+    logger.log('🔄 Executing Manifest Fingerprint Update...');
     
     try {
       const newFingerprint = this.generateManifestFingerprint();
@@ -230,14 +232,14 @@ class CacheBustingManager {
       
       return { success: true, details: { fingerprint: newFingerprint } };
     } catch (error) {
-      console.error('Manifest Fingerprint Update failed:', error);
+      logger.error('Manifest Fingerprint Update failed:', error);
       return { success: false, error: error.message };
     }
   }
 
   // Test All Strategies
   async testAllStrategies() {
-    console.log('🧪 Testing all cache busting strategies...');
+    logger.log('🧪 Testing all cache busting strategies...');
     
     const results = [];
     
@@ -262,7 +264,7 @@ class CacheBustingManager {
     }
     
     const successful = results.filter(r => r.success).length;
-    console.log(`✅ Cache busting test completed: ${successful}/${results.length} strategies successful`);
+    logger.log(`✅ Cache busting test completed: ${successful}/${results.length} strategies successful`);
     
     return results;
   }
@@ -311,7 +313,7 @@ class CacheBustingManager {
     
     // Update user agent if possible (limited by browser security)
     if (this.config.debugMode) {
-      console.log('New fingerprint applied:', fingerprint);
+      logger.log('New fingerprint applied:', fingerprint);
     }
   }
 
@@ -331,7 +333,7 @@ class CacheBustingManager {
     localStorage.setItem('bypass-strategies', JSON.stringify(strategies));
     
     if (this.config.debugMode) {
-      console.log('Bypass strategies applied:', strategies);
+      logger.log('Bypass strategies applied:', strategies);
     }
   }
 
@@ -349,7 +351,7 @@ class CacheBustingManager {
     localStorage.setItem('network-conditions', JSON.stringify(conditions));
     
     if (this.config.debugMode) {
-      console.log('Network conditions applied:', conditions);
+      logger.log('Network conditions applied:', conditions);
     }
   }
 
@@ -362,7 +364,7 @@ class CacheBustingManager {
     localStorage.setItem('manifest-fingerprint', fingerprint);
     
     if (this.config.debugMode) {
-      console.log('Manifest fingerprint updated:', fingerprint);
+      logger.log('Manifest fingerprint updated:', fingerprint);
     }
   }
 
@@ -385,7 +387,7 @@ class CacheBustingManager {
       await this.serviceWorkerVersionBump();
       await this.conditionalRequestBypass();
     } catch (error) {
-      console.error('Periodic update check failed:', error);
+      logger.error('Periodic update check failed:', error);
     }
   }
 
@@ -394,9 +396,9 @@ class CacheBustingManager {
     if ('serviceWorker' in navigator) {
       try {
         const registration = await navigator.serviceWorker.register('/sw.js');
-        console.log('Service worker registered for cache busting');
+        logger.log('Service worker registered for cache busting');
       } catch (error) {
-        console.error('Service worker registration failed:', error);
+        logger.error('Service worker registration failed:', error);
       }
     }
   }

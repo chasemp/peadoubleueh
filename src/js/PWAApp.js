@@ -10,6 +10,8 @@ import PerformanceMonitor from './utils/PerformanceMonitor.js';
 import CacheBustingManager from './strategies/CacheBustingManager.js';
 import ServiceWorkerManager from './service-workers/ServiceWorkerManager.js';
 import DemoDataManager from './utils/DemoDataManager.js';
+import logger from './utils/Logger.js';
+import EventHelper from './utils/EventHelper.js';
 
 class PWAApp {
   constructor() {
@@ -37,7 +39,7 @@ class PWAApp {
   async init() {
     if (this.isInitialized) return;
     
-    console.log('🚀 Initializing PWA Template...');
+    logger.info('🚀', 'Initializing PWA Template...');
     
     try {
       // Initialize all managers
@@ -59,10 +61,10 @@ class PWAApp {
       this.showContent();
       
       this.isInitialized = true;
-      console.log('✅ PWA Template initialized successfully');
+      logger.success('PWA Template initialized successfully');
       
     } catch (error) {
-      console.error('❌ Failed to initialize PWA Template:', error);
+      logger.error('❌ Failed to initialize PWA Template:', error);
       this.handleInitializationError(error);
     }
   }
@@ -90,50 +92,80 @@ class PWAApp {
   }
 
   setupEventListeners() {
-    // Theme toggle
-    document.getElementById('theme-toggle')?.addEventListener('click', () => {
-      this.themeManager.toggleTheme();
-    });
+    // Theme toggle (touch + click)
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+      EventHelper.addUniversalHandler(themeToggle, () => {
+        this.themeManager.toggleTheme();
+      });
+    }
     
-    // Settings page navigation
-    document.getElementById('settings-btn')?.addEventListener('click', () => {
-      this.showPage('settings');
-    });
+    // Settings page navigation (touch + click)
+    const settingsBtn = document.getElementById('settings-btn');
+    if (settingsBtn) {
+      EventHelper.addUniversalHandler(settingsBtn, () => {
+        this.showPage('settings');
+      });
+    }
     
-    document.getElementById('back-btn')?.addEventListener('click', () => {
-      this.showPage('main');
-    });
+    const backBtn = document.getElementById('back-btn');
+    if (backBtn) {
+      EventHelper.addUniversalHandler(backBtn, () => {
+        this.showPage('main');
+      });
+    }
     
-    // Install prompt
-    document.getElementById('install-btn')?.addEventListener('click', () => {
-      this.handleInstallPrompt();
-    });
+    // Install prompt (touch + click)
+    const installBtn = document.getElementById('install-btn');
+    if (installBtn) {
+      EventHelper.addUniversalHandler(installBtn, () => {
+        this.handleInstallPrompt();
+      });
+    }
     
-    document.getElementById('dismiss-install')?.addEventListener('click', () => {
-      this.hideInstallPrompt();
-    });
+    const dismissInstall = document.getElementById('dismiss-install');
+    if (dismissInstall) {
+      EventHelper.addUniversalHandler(dismissInstall, () => {
+        this.hideInstallPrompt();
+      });
+    }
     
-    // Update prompt
-    document.getElementById('update-btn')?.addEventListener('click', () => {
-      this.handleUpdatePrompt();
-    });
+    // Update prompt (touch + click)
+    const updateBtn = document.getElementById('update-btn');
+    if (updateBtn) {
+      EventHelper.addUniversalHandler(updateBtn, () => {
+        this.handleUpdatePrompt();
+      });
+    }
     
-    document.getElementById('dismiss-update')?.addEventListener('click', () => {
-      this.hideUpdatePrompt();
-    });
+    const dismissUpdate = document.getElementById('dismiss-update');
+    if (dismissUpdate) {
+      EventHelper.addUniversalHandler(dismissUpdate, () => {
+        this.hideUpdatePrompt();
+      });
+    }
     
-    // Demo buttons
-    document.getElementById('test-cache-busting')?.addEventListener('click', () => {
-      this.testCacheBusting();
-    });
+    // Demo buttons (touch + click)
+    const testCacheBusting = document.getElementById('test-cache-busting');
+    if (testCacheBusting) {
+      EventHelper.addUniversalHandler(testCacheBusting, () => {
+        this.testCacheBusting();
+      });
+    }
     
-    document.getElementById('test-offline')?.addEventListener('click', () => {
-      this.testOfflineMode();
-    });
+    const testOffline = document.getElementById('test-offline');
+    if (testOffline) {
+      EventHelper.addUniversalHandler(testOffline, () => {
+        this.testOfflineMode();
+      });
+    }
     
-    document.getElementById('test-notifications')?.addEventListener('click', () => {
-      this.testNotifications();
-    });
+    const testNotifications = document.getElementById('test-notifications');
+    if (testNotifications) {
+      EventHelper.addUniversalHandler(testNotifications, () => {
+        this.testNotifications();
+      });
+    }
     
     // Settings form
     document.getElementById('theme-select')?.addEventListener('change', (e) => {
@@ -200,7 +232,7 @@ class PWAApp {
       // Check for install prompt
       this.checkInstallPrompt();
     } catch (error) {
-      console.error('Failed to initialize UI:', error);
+      logger.error('Failed to initialize UI:', error);
       throw error; // Fail fast - don't retry
     }
   }
@@ -215,11 +247,11 @@ class PWAApp {
       const isDemoMode = this.storageManager.getData('demo_mode') === 'true';
       
       if (!isDemoMode) {
-        console.log('📊 Demo mode disabled, skipping demo data initialization');
+        logger.info('📊', 'Demo mode disabled, skipping demo data initialization');
         return;
       }
 
-      console.log('📊 Initializing demo data from platform...');
+      logger.info('📊', 'Initializing demo data from platform...');
       
       // Load demo data from platform
       const demoData = await this.demoDataManager.loadDemoData();
@@ -230,14 +262,14 @@ class PWAApp {
       // Notify that demo data is ready
       this.notifyDemoDataReady(demoData);
       
-      console.log('✅ Demo data initialized successfully');
+      logger.success('Demo data initialized successfully');
       
     } catch (error) {
-      console.error('❌ Failed to initialize demo data:', error);
+      logger.error('❌ Failed to initialize demo data:', error);
       
       // Don't throw error - demo data is optional
       // Just log the error and continue
-      console.log('📊 Continuing without demo data');
+      logger.info('📊', 'Continuing without demo data');
     }
   }
 
@@ -260,7 +292,7 @@ class PWAApp {
    * This can be used to update UI with demo data
    */
   notifyDemoDataReady(demoData) {
-    console.log('📊 Demo data ready:', demoData);
+    logger.info('📊', 'Demo data ready:', demoData);
     
     // Dispatch custom event for demo data ready
     const event = new CustomEvent('demoDataReady', {
@@ -280,7 +312,7 @@ class PWAApp {
     // Example: Update demo data display
     const demoStats = this.demoDataManager.getDemoDataStats();
     if (demoStats) {
-      console.log('📊 Demo data stats:', demoStats);
+      logger.info('📊', 'Demo data stats:', demoStats);
       
       // Update demo data info in UI
       const demoInfo = document.getElementById('demo-info');
@@ -430,7 +462,7 @@ class PWAApp {
       await this.serviceWorkerManager.installApp();
       this.hideInstallPrompt();
     } catch (error) {
-      console.error('Failed to install app:', error);
+      logger.error('Failed to install app:', error);
     }
   }
 
@@ -454,27 +486,27 @@ class PWAApp {
       await this.serviceWorkerManager.updateApp();
       this.hideUpdatePrompt();
     } catch (error) {
-      console.error('Failed to update app:', error);
+      logger.error('Failed to update app:', error);
     }
   }
 
   // Demo Functions
   async testCacheBusting() {
-    console.log('🧪 Testing cache busting...');
+    logger.info('🧪', 'Testing cache busting...');
     try {
       const result = await this.cacheBustingManager.testAllStrategies();
-      console.log('Cache busting test results:', result);
+      logger.log('Cache busting test results:', result);
       
       if (this.config.enableNotifications) {
         this.notificationManager.show('Cache Busting Test', 'Test completed successfully!');
       }
     } catch (error) {
-      console.error('Cache busting test failed:', error);
+      logger.error('Cache busting test failed:', error);
     }
   }
 
   async testOfflineMode() {
-    console.log('📱 Testing offline mode...');
+    logger.info('📱', 'Testing offline mode...');
     
     // Simulate offline mode
     const originalOnline = navigator.onLine;
@@ -501,17 +533,17 @@ class PWAApp {
   }
 
   async testNotifications() {
-    console.log('🔔 Testing notifications...');
+    logger.info('🔔', 'Testing notifications...');
     try {
       await this.notificationManager.show('Test Notification', 'This is a test notification from the PWA Template!');
     } catch (error) {
-      console.error('Notification test failed:', error);
+      logger.error('Notification test failed:', error);
     }
   }
 
   // Event Handlers
   handleCacheBustingUpdate(event) {
-    console.log('🔄 Cache busting update detected:', event);
+    logger.info('🔄', 'Cache busting update detected:', event);
     
     if (this.config.enableNotifications) {
       this.notificationManager.show('Update Available', 'New content has been detected and will be loaded.');
@@ -535,7 +567,7 @@ class PWAApp {
 
   handleOnlineStatusChange(isOnline) {
     if (isOnline) {
-      console.log('🌐 App is online');
+      logger.info('🌐', 'App is online');
       this.hideOfflineIndicator();
       
       // Check for updates when coming back online
@@ -543,7 +575,7 @@ class PWAApp {
         this.checkForUpdates();
       }
     } else {
-      console.log('📱 App is offline');
+      logger.info('📱', 'App is offline');
       this.showOfflineIndicator();
     }
   }
@@ -581,7 +613,7 @@ class PWAApp {
   updatePerformanceMetrics(metrics) {
     // Update performance metrics in UI if needed
     if (this.config.debugMode) {
-      console.log('Performance metrics:', metrics);
+      logger.log('Performance metrics:', metrics);
     }
   }
 
@@ -589,12 +621,12 @@ class PWAApp {
     try {
       await this.serviceWorkerManager.checkForUpdates();
     } catch (error) {
-      console.error('Update check failed:', error);
+      logger.error('Update check failed:', error);
     }
   }
 
   handleInitializationError(error) {
-    console.error('Initialization error:', error);
+    logger.error('Initialization error:', error);
     
     // Show error message to user
     const errorDiv = document.createElement('div');

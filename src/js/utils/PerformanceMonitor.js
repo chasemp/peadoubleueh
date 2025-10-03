@@ -3,6 +3,8 @@
  * Based on lessons learned from multiple PWA projects
  */
 
+import logger from './Logger.js';
+
 class PerformanceMonitor {
   constructor() {
     this.metrics = {
@@ -26,7 +28,7 @@ class PerformanceMonitor {
   start() {
     if (this.isMonitoring) return;
     
-    console.log('📊 Starting Performance Monitor...');
+    logger.log('📊 Starting Performance Monitor...');
     
     try {
       // Set up Performance Observer
@@ -42,16 +44,16 @@ class PerformanceMonitor {
       this.setupPeriodicCollection();
       
       this.isMonitoring = true;
-      console.log('✅ Performance Monitor started successfully');
+      logger.log('✅ Performance Monitor started successfully');
     } catch (error) {
-      console.error('❌ Failed to start Performance Monitor:', error);
+      logger.error('❌ Failed to start Performance Monitor:', error);
     }
   }
 
   stop() {
     if (!this.isMonitoring) return;
     
-    console.log('📊 Stopping Performance Monitor...');
+    logger.log('📊 Stopping Performance Monitor...');
     
     if (this.performanceObserver) {
       this.performanceObserver.disconnect();
@@ -59,12 +61,12 @@ class PerformanceMonitor {
     }
     
     this.isMonitoring = false;
-    console.log('✅ Performance Monitor stopped');
+    logger.log('✅ Performance Monitor stopped');
   }
 
   setupPerformanceObserver() {
     if (!('PerformanceObserver' in window)) {
-      console.warn('PerformanceObserver not supported');
+      logger.warn('PerformanceObserver not supported');
       return;
     }
 
@@ -88,11 +90,11 @@ class PerformanceMonitor {
         try {
           this.performanceObserver.observe({ entryTypes: [type] });
         } catch (error) {
-          console.warn(`Failed to observe ${type}:`, error);
+          logger.warn(`Failed to observe ${type}:`, error);
         }
       });
     } catch (error) {
-      console.error('Failed to setup Performance Observer:', error);
+      logger.error('Failed to setup Performance Observer:', error);
     }
   }
 
@@ -155,7 +157,7 @@ class PerformanceMonitor {
 
   setupMemoryMonitoring() {
     if (!('memory' in performance)) {
-      console.warn('Memory API not supported');
+      logger.warn('Memory API not supported');
       return;
     }
 
@@ -167,7 +169,7 @@ class PerformanceMonitor {
 
   setupBandwidthMonitoring() {
     if (!('connection' in navigator)) {
-      console.warn('Network Information API not supported');
+      logger.warn('Network Information API not supported');
       return;
     }
 
@@ -219,7 +221,7 @@ class PerformanceMonitor {
       try {
         callback(this.getCurrentMetrics());
       } catch (error) {
-        console.error('Error in metrics callback:', error);
+        logger.error('Error in metrics callback:', error);
       }
     });
   }
@@ -336,7 +338,7 @@ class PerformanceMonitor {
 
   // Benchmarking
   async runBenchmarks() {
-    console.log('🏃 Running performance benchmarks...');
+    logger.log('🏃 Running performance benchmarks...');
     
     const benchmarks = {
       loadTime: await this.benchmarkLoadTime(),
@@ -345,7 +347,7 @@ class PerformanceMonitor {
       cachePerformance: await this.benchmarkCachePerformance()
     };
     
-    console.log('✅ Benchmarks completed:', benchmarks);
+    logger.log('✅ Benchmarks completed:', benchmarks);
     return benchmarks;
   }
 
