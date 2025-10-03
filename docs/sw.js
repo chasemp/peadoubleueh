@@ -168,8 +168,11 @@ async function handleDynamicRequest(request) {
     // Fetch from network in background
     const networkPromise = fetch(request).then(networkResponse => {
       if (networkResponse.ok) {
-        const cache = caches.open(DYNAMIC_CACHE_NAME);
-        cache.then(c => c.put(request, networkResponse.clone()));
+        // Clone BEFORE using the response to avoid "body already used" error
+        const responseToCache = networkResponse.clone();
+        caches.open(DYNAMIC_CACHE_NAME).then(cache => {
+          cache.put(request, responseToCache);
+        });
       }
       return networkResponse;
     }).catch(() => null);
