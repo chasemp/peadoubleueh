@@ -1,0 +1,33 @@
+{
+  "name": "pwa-template",
+  "version": "1.0.0",
+  "description": "A comprehensive PWA template with all best practices learned from multiple projects",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && node scripts/generate-build-info.js",
+    "preview": "vite preview --port 3001",
+    "test": "echo 'No tests specified' && exit 0",
+    "setup-hooks": "node scripts/setup-pre-commit-hook.js"
+  },
+  "keywords": [
+    "pwa",
+    "progressive-web-app",
+    "template",
+    "best-practices",
+    "mobile-first"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^5.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chasemp/peadoubleueh.git"
+  },
+  "homepage": "https://pea.523.life/",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
