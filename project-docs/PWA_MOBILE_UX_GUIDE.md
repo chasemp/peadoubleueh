@@ -368,6 +368,81 @@ showRecipeDetail(recipeId) {
 
 ---
 
+## 🚀 Mobile Performance Optimizations
+
+### Prevent Common Mobile Performance Issues
+
+**From CannonPop production experience:**
+
+```typescript
+// Prevent pull-to-refresh on game screens
+document.body.style.overscrollBehavior = 'none';
+
+// Optimize touch handling performance
+element.style.touchAction = 'manipulation';
+element.style.setProperty('-webkit-tap-highlight-color', 'transparent');
+
+// Prevent zoom on input focus
+// <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+```
+
+### Progressive Loading Strategy
+
+**Mobile-optimized loading sequence:**
+
+```typescript
+// 1. Load PWA shell (fast initial render)
+showLoadingState();
+
+// 2. Load critical resources
+await loadScript('/libs/essential.min.js');
+
+// 3. Load secondary resources
+await loadScript('./game-logic.js');
+
+// 4. Initialize and hide loading
+initializeApp();
+hideLoadingState();
+```
+
+### Touch Target Optimization
+
+**Ensure minimum 44px touch targets:**
+
+```typescript
+// Automatic touch target enforcement
+function ensureTouchTargets() {
+  document.querySelectorAll('button, .interactive').forEach(element => {
+    const rect = element.getBoundingClientRect();
+    if (rect.height < 44 || rect.width < 44) {
+      element.style.minHeight = '44px';
+      element.style.minWidth = '44px';
+    }
+  });
+}
+```
+
+### Viewport Management
+
+**Critical viewport settings for PWAs:**
+
+```html
+<!-- Prevent zoom on input focus, optimize for mobile -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<!-- iOS-specific optimizations -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+```
+
+### Mobile-Specific Architecture Considerations
+
+**Avoid iframe architectures on mobile:**
+- **Double document loading** increases memory usage
+- **PostMessage overhead** affects performance
+- **iOS Safari iframe quirks** create additional issues
+- **Direct integration** is faster and more reliable
+
 ## 💡 Key Mobile UX Takeaways
 
 - **Mobile-first isn't just about screen size** - it's about touch, space efficiency, and user expectations

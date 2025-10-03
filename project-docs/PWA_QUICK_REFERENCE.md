@@ -532,6 +532,67 @@ try {
 }
 ```
 
+#### Service Worker Development vs Production Strategy
+
+**Critical Lesson**: Different caching strategies prevent development issues
+
+```javascript
+// Development vs Production caching strategy
+const isDev = () => location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+
+self.addEventListener('fetch', (event) => {
+  if (isDev()) {
+    // Network-first in development - always get fresh content
+    event.respondWith(
+      fetch(request)
+        .then(response => response)
+        .catch(() => caches.match(request))
+    );
+  } else {
+    // Cache-first in production - performance optimized
+    event.respondWith(
+      caches.match(request)
+        .then(response => response || fetch(request))
+    );
+  }
+});
+```
+
+#### Service Worker Debugging Checklist
+
+**Essential debugging steps from production experience:**
+
+1. **Always check "Update on reload"** in Chrome DevTools → Application → Service Workers
+2. **Manually unregister** during development:
+   ```javascript
+   // In console
+   navigator.serviceWorker.getRegistrations().then(registrations => {
+     registrations.forEach(registration => registration.unregister());
+   });
+   ```
+3. **Use network-first strategy** in development mode
+4. **Version your caches** to force updates:
+   ```javascript
+   const CACHE_VERSION = '1.0.1'; // Increment to force refresh
+   const CACHE_NAME = `app-cache-${CACHE_VERSION}`;
+   ```
+5. **Test with cache disabled** during development
+6. **Implement fault-tolerant install**:
+   ```javascript
+   self.addEventListener('install', (event) => {
+     event.waitUntil(
+       caches.open(CACHE_NAME).then(cache => {
+         // Cache each asset individually to prevent total failure
+         return Promise.allSettled(
+           STATIC_ASSETS.map(url => 
+             cache.add(url).catch(err => console.warn(`Failed to cache ${url}`))
+           )
+         );
+       })
+     );
+   });
+   ```
+
 ---
 
 ### Common Theming Mistakes

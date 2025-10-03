@@ -116,6 +116,92 @@ afterEach(() => {
 3. **Complete Cleanup**: afterEach must restore ALL modified state
 4. **Test Isolation**: No test should depend on another test's state
 
+#### **Advanced Testing Patterns for Constructors with Side Effects**
+
+**Pattern 1: Explicit Side Effect Testing**
+```javascript
+// Test the side effect explicitly in isolation
+it('should populate demo data on first load', () => {
+    localStorage.clear(); // Clean slate
+    const newInstance = new SettingsManager(); // Allow side effect
+    expect(localStorage.getItem('demo_data')).toBeTruthy();
+});
+```
+
+**Pattern 2: Side Effect Prevention**
+```javascript
+// Test normal behavior with side effects prevented
+it('should work normally without side effects', () => {
+    localStorage.setItem('prevent_side_effect_flag', 'true');
+    const instance = new SettingsManager(); // No side effects
+    // Test normal behavior
+    expect(instance.getSettings()).toBeDefined();
+});
+```
+
+**Pattern 3: Explicit Failure vs Silent Fallbacks**
+```javascript
+// GOOD: Test explicit failure behavior
+it('should fail explicitly when original data unavailable', () => {
+    const manager = new DataManager();
+    manager.originalDemoData = null; // Simulate missing data
+    
+    const result = manager.resetDemoData();
+    expect(result).toBe(false); // Explicit failure
+    expect(console.error).toHaveBeenCalledWith(
+        expect.stringContaining('Original demo data not available')
+    );
+});
+
+// BAD: Don't test silent fallbacks that mask problems
+it('should silently fall back when data missing', () => {
+    // This test encourages hiding problems
+    const manager = new DataManager();
+    manager.originalDemoData = null;
+    
+    const result = manager.resetDemoData(); // Silently falls back
+    expect(result).toBe(true); // Masks the real problem
+});
+```
+
+#### **Multi-Tier Testing Strategy Implementation**
+
+**Tier 1: Critical Regression Tests (Block Commits)**
+```javascript
+// These tests MUST pass before any commit
+describe('Critical Regression Tests', () => {
+    it('should not break core user workflows', () => {
+        // Test critical paths that users depend on
+        const result = performCriticalUserAction();
+        expect(result.success).toBe(true);
+    });
+});
+```
+
+**Tier 2: Comprehensive Unit Tests (Informational)**
+```javascript
+// These provide feedback but don't block commits
+describe('Comprehensive Unit Tests', () => {
+    it('should handle edge cases correctly', () => {
+        // Test edge cases and implementation details
+        const result = handleEdgeCase();
+        expect(result).toMatchSnapshot();
+    });
+});
+```
+
+**Tier 3: Integration & E2E Tests (CI/CD)**
+```javascript
+// Run in CI/CD pipeline
+describe('Integration Tests', () => {
+    it('should work end-to-end in browser', async () => {
+        await page.goto('http://localhost:3000');
+        await page.click('[data-testid="critical-action"]');
+        expect(await page.textContent('.result')).toBe('Success');
+    });
+});
+```
+
 ### **Testing Strategy for PWA Refactoring**
 
 #### **The Golden Rule of Refactoring**
