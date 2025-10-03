@@ -11,10 +11,10 @@
 | 3002 | cannonpop     | Active | [add-repo]                          | [add-url]                 |
 | 3003 | bustagroove   | Active | [add-repo]                          | [add-url]                 |
 | 3004 | mealplanner   | Active | [add-repo]                          | [add-url]                 |
-| 3005 | [reserved]    | -      | -                                   | -                         |
+| 3005 | Giffer/Pipkin | Active | chasemp/Giffer                      | https://giffer.523.life   |
 | 3006 | [reserved]    | -      | -                                   | -                         |
 
-**Next Available Port:** 3005
+**Next Available Port:** 3006
 
 ---
 
@@ -29,6 +29,9 @@ cd ~/git/blockdoku && npm run dev                 # → http://localhost:3001
 
 # CannonPop  
 cd ~/git/cannonpop && npm run dev                 # → http://localhost:3002
+
+# Giffer (Pipkin)
+cd ~/git/chasemp/Giffer && npm run dev            # → http://localhost:3005
 ```
 
 ---
