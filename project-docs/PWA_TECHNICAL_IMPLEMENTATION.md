@@ -296,6 +296,65 @@ class ComponentFactory {
 - ✅ Easy to extend
 - ✅ Configuration management
 
+### **Iframe vs Direct Integration Architecture**
+
+#### **❌ When Iframe Architecture Becomes Problematic**
+
+**Case Study: CannonPop Game Integration**
+
+Initially implemented complex iframe architecture:
+```typescript
+// ❌ PROBLEMATIC: Complex iframe + postMessage
+<iframe src="game.html" on:load={handleGameLoad}></iframe>
+window.addEventListener('message', handleGameMessage);
+
+// Issues encountered:
+// 1. Aggressive service worker caching of iframe content
+// 2. PostMessage communication complexity
+// 3. Development vs production inconsistencies  
+// 4. Mobile performance overhead (double document loading)
+```
+
+**Critical Problems:**
+- **Service Worker Conflicts**: SW cached iframe content independently, breaking development
+- **Communication Complexity**: Async postMessage timing issues, origin validation
+- **Performance Overhead**: Double document loading, more memory usage on mobile
+- **Debugging Nightmare**: Code changes not taking effect, cross-context debugging
+
+#### **✅ Direct Integration Solution**
+
+```typescript
+// ✅ BETTER: Direct integration
+<div id="game-container"></div>
+await loadScript('/libs/phaser.min.js');
+await loadScript('./game-legacy.js');
+
+// Global communication (same context)
+(window as any).handleScoreUpdate = handleScoreUpdate;
+(window as any).handleGameLoaded = handleGameLoaded;
+```
+
+**Benefits:**
+- ✅ **No caching conflicts** - Single document context
+- ✅ **Direct function calls** - No postMessage complexity  
+- ✅ **Faster loading** - No iframe navigation overhead
+- ✅ **Easier debugging** - Everything in one context
+- ✅ **Better mobile performance** - Less memory overhead
+
+#### **Decision Framework: Iframe vs Direct Integration**
+
+| Factor | Use Iframe | Use Direct Integration |
+|--------|------------|----------------------|
+| **Security isolation needed** | ✅ Yes | ❌ No |
+| **Cross-origin content** | ✅ Yes | ❌ No |
+| **Complex bidirectional communication** | ❌ No | ✅ Yes |
+| **Mobile performance critical** | ❌ No | ✅ Yes |
+| **Development iteration speed** | ❌ No | ✅ Yes |
+| **Service worker caching involved** | ❌ No | ✅ Yes |
+| **Same-origin game/app** | ❌ No | ✅ Yes |
+
+**Key Takeaway**: Choose simplicity over cleverness. Direct integration beats complex iframe architectures for same-origin content.
+
 ### **Architecture Red Flags**
 
 Watch for these warning signs in PWA architecture:
