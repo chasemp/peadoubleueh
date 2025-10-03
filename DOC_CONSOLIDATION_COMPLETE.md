@@ -302,3 +302,34 @@ project-docs/
 
 **The documentation is now production-ready for use across all PWA projects.** 🚀
 
+---
+
+## 🌐 **Update: Documentation Now Deployed with Site**
+
+**Date:** October 3, 2025 (later same day)
+
+### What Changed
+
+Documentation is now deployed alongside the PWA app at https://pea.523.life/
+
+**Implementation:**
+1. Added Vite plugin to copy `/project-docs/` → `/docs/project-docs/`
+2. Updated all inter-document links from relative (`./file.md`) to absolute (`/project-docs/file.md`)
+3. Rebuilt to deploy documentation
+
+**Result:**
+- ✅ Documentation accessible at https://pea.523.life/project-docs/
+- ✅ All links work on deployed site
+- ✅ PWA app can link to documentation
+- ✅ Documentation browsable on web (markdown rendered by browser or GitHub)
+
+**URLs:**
+- Index: https://pea.523.life/project-docs/PWA_DEVELOPMENT_LESSONS.md
+- Deployment Guide: https://pea.523.life/project-docs/DEPLOYMENT_ARCHITECTURE.md
+- Quick Reference: https://pea.523.life/project-docs/PWA_QUICK_REFERENCE.md
+- Mobile UX: https://pea.523.life/project-docs/PWA_MOBILE_UX_GUIDE.md
+- Workflow: https://pea.523.life/project-docs/PWA_DEVELOPMENT_WORKFLOW.md
+- Technical: https://pea.523.life/project-docs/PWA_TECHNICAL_IMPLEMENTATION.md
+
+**Note:** Browsers will prompt to download `.md` files, but the content is there and linkable. For better rendering, consider adding a markdown-to-HTML build step in the future.
+

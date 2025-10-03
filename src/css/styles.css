@@ -1,5 +1,100 @@
 /* PWA Template Styles - Best Practices from Multiple Projects */
 
+/* Documentation Section Styles */
+.documentation {
+  margin: var(--spacing-xl) 0;
+  padding: var(--spacing-lg);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--color-primary);
+}
+
+.documentation h3 {
+  margin-top: 0;
+  color: var(--color-primary);
+}
+
+.doc-links {
+  display: grid;
+  gap: var(--spacing-md);
+  margin: var(--spacing-lg) 0;
+}
+
+.doc-link {
+  display: block;
+  padding: var(--spacing-md);
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--color-text);
+  transition: all var(--transition-fast);
+}
+
+.doc-link:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary);
+}
+
+.doc-link strong {
+  display: block;
+  color: var(--color-primary);
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-xs);
+}
+
+.doc-link p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.repo-info {
+  margin: var(--spacing-xl) 0;
+  padding: var(--spacing-lg);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+}
+
+.repo-info pre {
+  background: var(--color-text);
+  color: #00ff00;
+  padding: var(--spacing-md);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  margin: var(--spacing-md) 0;
+}
+
+.repo-info code {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: var(--font-size-sm);
+}
+
+.repo-info a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.repo-info a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive adjustments for doc links */
+@media (min-width: 768px) {
+  .doc-links {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .doc-links {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* PWA Template Styles - Best Practices from Multiple Projects */
+
 /* CSS Custom Properties for Theming */
 :root {
   /* Light Theme Colors */
