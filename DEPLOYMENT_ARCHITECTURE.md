@@ -79,13 +79,16 @@ Clear separation with automation and protection
 ```
 
 **Simple rule:** 
-- `/src` = Source of truth (humans edit here)
-- `/docs` = Build artifacts (robots generate here)
-- Never the twain shall meet
+- `/src` = Application source code (HTML, JS, CSS) - Vite processes/builds these
+- `/public` = Static assets (icons, manifest, CNAME) - Vite copies as-is
+- `/docs` = Build artifacts (robots generate here from /src + /public)
+- Never edit `/docs` - only edit `/src` and `/public`
 
 ### Architecture Philosophy
 
-1. **Single Source of Truth**: Everything comes from `/src`
+1. **Dual Source Directories**: 
+   - `/src` for code that gets processed (HTML, JS, CSS)
+   - `/public` for static files copied as-is (CNAME, icons, manifest)
 2. **Generated is Separate**: Built files live in `/docs`, never mixed
 3. **Automation Required**: Pre-commit hook ensures consistency
 4. **Multiple Protections**: Layers prevent mistakes
@@ -103,41 +106,41 @@ your-pwa/
 │   └── hooks/
 │       └── pre-commit              # 🤖 Automates everything
 │
-├── src/                            # ✅ SOURCE CODE
-│   ├── index.html                  # Edit this
+├── src/                            # ✅ SOURCE CODE (processed by Vite)
+│   ├── index.html                  # Edit this - gets transformed
 │   ├── settings.html
 │   ├── js/
-│   │   ├── app.js
+│   │   ├── app.js                  # Bundled & minified
 │   │   ├── core/
 │   │   ├── ui/
 │   │   └── ...
 │   ├── css/
-│   │   ├── main.css
+│   │   ├── main.css                # Bundled & minified
 │   │   └── themes/
 │   └── assets/
-│       └── images/
+│       └── images/                 # Optimized during build
 │
-├── docs/                           # 🤖 BUILD OUTPUT
+├── public/                         # ✅ STATIC ASSETS (copied as-is)
+│   ├── CNAME                       # Custom domain (required!)
+│   ├── favicon.ico
+│   ├── manifest.json               # PWA manifest
+│   └── icons/                      # App icons
+│       ├── icon-192x192.png
+│       └── icon-512x512.png
+│
+├── docs/                           # 🤖 BUILD OUTPUT (never edit!)
 │   ├── index.html                  # Generated from src/index.html
 │   ├── settings.html               # Generated from src/settings.html
 │   ├── assets/                     # Bundled, minified, hashed
-│   │   ├── main-[hash].js         # All JS bundled
-│   │   ├── main-[hash].css        # All CSS bundled
+│   │   ├── main-[hash].js         # All JS bundled from src/
+│   │   ├── main-[hash].css        # All CSS bundled from src/
 │   │   └── ...
-│   ├── build                       # Quick version reference
-│   ├── build-info.json             # Metadata for app
-│   ├── manifest.json               # From public/
-│   ├── icons/                      # From public/
-│   ├── sw.js                       # Service worker
-│   └── CNAME                       # Custom domain
-│
-├── public/                         # 📦 STATIC ASSETS
-│   ├── manifest.json               # Copied as-is to /docs
-│   ├── icons/
-│   │   ├── icon-192x192.png
-│   │   └── ...
-│   ├── favicon.ico
-│   └── ...
+│   ├── build                       # Build metadata
+│   ├── build-info.json             # Build metadata
+│   ├── CNAME                       # Copied from public/
+│   ├── manifest.json               # Copied from public/
+│   ├── icons/                      # Copied from public/
+│   └── sw.js                       # Service worker (from src/)
 │
 ├── project-docs/                   # 📚 PROJECT DOCUMENTATION
 │   ├── README.md                   # Project-specific docs
@@ -196,6 +199,65 @@ GitHub Pages serves:
   https://your-domain.com
   From /docs on main branch
 ```
+
+### Understanding /src vs /public
+
+**Critical Concept:** Vite uses TWO source directories with different behaviors.
+
+#### `/src` Directory (Processed Code)
+**What:** Application source code  
+**Contains:** HTML, JS, CSS, source images  
+**Vite Behavior:** Processes, transforms, bundles, minifies  
+**Output:** Optimized files with cache-busting hashes
+
+**Example:**
+```
+src/js/app.js  →  Vite  →  docs/assets/app-a1b2c3d4.js
+```
+
+**Edit these when:**
+- Writing application code
+- Modifying HTML structure  
+- Changing CSS styles
+- Adding JavaScript logic
+
+#### `/public` Directory (Static Assets)
+**What:** Files that should NOT be processed  
+**Contains:** CNAME, favicon, manifest.json, icons  
+**Vite Behavior:** Copies as-is, no transformation  
+**Output:** Exact copies in `/docs`
+
+**Example:**
+```
+public/CNAME  →  Vite  →  docs/CNAME (identical)
+```
+
+**Edit these when:**
+- Changing custom domain (CNAME)
+- Updating PWA manifest
+- Replacing app icons
+- Modifying favicon
+
+#### ⚠️ Common Mistake
+
+```bash
+# ❌ WRONG - Editing /docs directly
+vim docs/CNAME  # Gets overwritten on next build!
+
+# ✅ CORRECT - Edit source
+vim public/CNAME  # Persists through builds
+npm run build     # Copies to docs/CNAME
+```
+
+#### Why Both Are Needed
+
+| Directory | Purpose | Vite Action | When to Use |
+|-----------|---------|-------------|-------------|
+| `/src` | Code that needs optimization | Bundle, minify, hash | App code (HTML, JS, CSS) |
+| `/public` | Files that must stay as-is | Copy verbatim | Static files (CNAME, icons) |
+| `/docs` | Deployed output | (Never edit!) | (Auto-generated) |
+
+**Key Rule:** Never manually create files in `/docs`. Always add to `/src` (if code) or `/public` (if static), then build.
 
 ---
 

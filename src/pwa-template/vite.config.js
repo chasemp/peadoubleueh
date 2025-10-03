@@ -29,6 +29,8 @@ import { resolve } from 'path'
 export default defineConfig({
   // Serve app files from `src/` during development
   root: 'src',
+  // Static files (CNAME, manifest, icons) that should be copied as-is
+  publicDir: '../public',
   // Use relative base to support GitHub Pages deployment
   base: './',
   build: {
