@@ -4,7 +4,24 @@
 
 ---
 
-## 🚀 **Quick Start: Which Guide Do I Need?**
+## 🚀 **New to PWAs? Start Here:**
+
+### **[📖 Getting Started Guide](/project-docs/GETTING_STARTED.md)** ⭐
+*Your complete guide to building your first PWA in 30 minutes*
+
+**Perfect for:**
+- Complete beginners to PWA development
+- Developers who want a guided walkthrough
+- Anyone who needs a working PWA quickly
+
+**What you'll learn:**
+- What PWAs are and why they matter
+- How to create and deploy your first PWA
+- Which advanced guides to read next
+
+---
+
+## 🎯 **Experienced Developer? Which Guide Do I Need?**
 
 ### **I'm building a mobile-first PWA**
 → Start with **[PWA Mobile UX Guide](/project-docs/PWA_MOBILE_UX_GUIDE.md)**  
@@ -31,12 +48,28 @@ Learn: Modular architecture, service workers, state management, refactoring patt
 Learn: Port assignment strategy, conflict prevention, management scripts, best practices
 
 ### **I need external resources, tools, or examples**
-→ Start with **[PWA Resources & References](/PWA_RESOURCES.md)**  
+→ Start with **[PWA Resources & References](/project-docs/PWA_RESOURCES.md)**  
 Find: Interactive demos (What PWA Can Do Today), testing tools, learning materials, showcase sites
 
 ---
 
 ## 📚 **Complete Guide Descriptions**
+
+### **[Getting Started Guide](/project-docs/GETTING_STARTED.md)** ⭐ (300+ lines)
+*Complete beginner's guide to PWA development*
+
+**When to use:** You're new to PWAs or want a guided walkthrough
+
+**Topics:**
+- What is a PWA and why build one
+- Create your first PWA in 30 minutes
+- Deploy to GitHub Pages for free
+- Which advanced guides to read next
+- Success checklist and troubleshooting
+
+**Best for:** Complete beginners, anyone wanting a quick start
+
+---
 
 ### **[PWA Quick Reference](/project-docs/PWA_QUICK_REFERENCE.md)** (520 lines)
 *Quick answers for busy developers*
@@ -153,7 +186,7 @@ Find: Interactive demos (What PWA Can Do Today), testing tools, learning materia
 
 ---
 
-### **[PWA Resources & References](/PWA_RESOURCES.md)** (400+ lines)
+### **[PWA Resources & References](/project-docs/PWA_RESOURCES.md)** (400+ lines)
 *Curated external resources, tools, and learning materials*
 
 **When to use:** Looking for external tools, examples, or learning resources
@@ -287,22 +320,26 @@ your-pwa/
 
 | Guide | Lines | Focus | Audience |
 |-------|-------|-------|----------|
+| **Getting Started Guide** | **300+** | **Complete beginner walkthrough** | **New developers** |
 | Quick Reference | 520 | Fast answers, code snippets | Busy developers |
 | Deployment Architecture | 1,009 | `/src → /docs` pattern | DevOps, tech leads |
 | Mobile UX Guide | 383 | Touch, responsive design | Designers, frontend |
 | Development Workflow | 1,828 | Testing, processes, CI/CD | QA, DevOps, managers |
+| Multi-PWA Port Management | 268 | Local development | Teams, multi-project |
+| PWA Resources | 400+ | External tools | Everyone |
 | Technical Implementation | 1,519 | Architecture, refactoring | Architects, senior devs |
-| **Total** | **5,259** | **Complete PWA knowledge** | **All roles** |
+| **Total** | **6,000+** | **Complete PWA knowledge** | **All roles** |
 
 ---
 
 ## 🎓 **Learning Paths**
 
 ### **New to PWA Development**
-1. Read [Quick Reference](/project-docs/PWA_QUICK_REFERENCE.md) - Get oriented
-2. Read [Mobile UX Guide](/project-docs/PWA_MOBILE_UX_GUIDE.md) - Understand mobile-first
-3. Read [Deployment Architecture](/project-docs/DEPLOYMENT_ARCHITECTURE.md) - Set up correctly from day 1
-4. Refer to other guides as needed
+1. **Start:** [Getting Started Guide](/project-docs/GETTING_STARTED.md) - Complete walkthrough
+2. **Build:** Follow the 30-minute tutorial to create your first PWA
+3. **Deploy:** Get it live on GitHub Pages
+4. **Learn:** [Mobile UX Guide](/project-docs/PWA_MOBILE_UX_GUIDE.md) - Mobile-first principles
+5. **Reference:** [Quick Reference](/project-docs/PWA_QUICK_REFERENCE.md) - Code patterns as needed
 
 ### **Experienced Web Developer (New to PWAs)**
 1. Read [Deployment Architecture](/project-docs/DEPLOYMENT_ARCHITECTURE.md) - Critical pattern
