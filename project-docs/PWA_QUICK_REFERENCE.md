@@ -7,13 +7,14 @@
 ## 📋 Table of Contents
 
 1. [Essential Code Patterns](#essential-code-patterns)
-2. [Theming & Color Palettes](#theming--color-palettes)
-3. [Quick Troubleshooting](#quick-troubleshooting)
-4. [Mobile Touch Events](#mobile-touch-events)
-5. [PWA Setup Checklist](#pwa-setup-checklist)
-6. [Deployment Quick Reference](#deployment-quick-reference)
-7. [Common Mistakes](#common-mistakes)
-8. [Key Takeaways](#key-takeaways)
+2. [Project Structure & File Organization](#project-structure--file-organization)
+3. [Theming & Color Palettes](#theming--color-palettes)
+4. [Quick Troubleshooting](#quick-troubleshooting)
+5. [Mobile Touch Events](#mobile-touch-events)
+6. [PWA Setup Checklist](#pwa-setup-checklist)
+7. [Deployment Quick Reference](#deployment-quick-reference)
+8. [Common Mistakes](#common-mistakes)
+9. [Key Takeaways](#key-takeaways)
 
 ---
 
@@ -310,6 +311,135 @@ class CacheBustingInvestigation {
 ```
 
 **Full guide:** [Development Workflow - Advanced PWA Patterns](/project-docs/PWA_DEVELOPMENT_WORKFLOW.md#advanced-pwa-patterns-from-production-projects)
+
+---
+
+## 📁 Project Structure & File Organization
+
+### Static Asset Organization
+
+#### ✅ Correct: Assets in `/public` directory
+
+```
+project/
+├── src/                    # Source code (processed by build tools)
+│   ├── index.html
+│   ├── js/
+│   ├── css/
+│   └── sw.js
+├── public/                 # Static assets (copied as-is to output)
+│   ├── CNAME
+│   ├── manifest.json
+│   ├── images/            # ✅ All images here
+│   │   ├── logo.png
+│   │   ├── icons/
+│   │   └── screenshots/
+│   └── assets/            # ✅ Other static files
+└── docs/                  # Build output (auto-generated)
+```
+
+#### ❌ Wrong: Assets scattered in root or wrong locations
+
+```
+project/
+├── image/                 # ❌ Should be public/images/
+├── assets/                # ❌ Should be public/assets/
+├── icons/                 # ❌ Should be public/images/icons/
+├── logo.png               # ❌ Should be public/images/logo.png
+└── src/
+    ├── images/            # ❌ Should be public/images/
+    └── assets/            # ❌ Should be public/assets/
+```
+
+### Key Principles
+
+1. **`/src`** - Source code that gets processed (HTML, JS, CSS, TypeScript)
+2. **`/public`** - Static assets copied as-is (images, manifest, CNAME, icons)
+3. **`/docs`** - Build output, never edit manually
+
+### Asset Path References
+
+```javascript
+// ✅ GOOD: Reference public assets with absolute paths
+<img src="/images/logo.png" alt="Logo">
+<link rel="manifest" href="/manifest.json">
+
+// ❌ BAD: Don't reference assets outside public/
+<img src="../image/logo.png" alt="Logo">        // Wrong location
+<img src="./src/assets/logo.png" alt="Logo">    // Wrong location
+```
+
+### Build Tool Integration
+
+```javascript
+// vite.config.js - Automatically handles public/ directory
+export default {
+  root: 'src',
+  publicDir: '../public',  // Points to public/ directory
+  outDir: '../docs',       // Build output
+  // Vite automatically copies public/ contents to docs/
+}
+```
+
+### Common Asset Organization Mistakes
+
+#### ❌ Mixed asset locations
+- Images in root `/image/` directory
+- Icons in `/src/assets/`
+- Manifest in root instead of `/public/`
+
+#### ❌ Hardcoded paths to wrong locations
+```html
+<!-- BAD: References assets outside public/ -->
+<link rel="icon" href="./image/favicon.ico">
+<img src="../assets/logo.png">
+```
+
+#### ✅ Consistent public/ organization
+```
+public/
+├── manifest.json          # PWA manifest
+├── CNAME                  # GitHub Pages domain
+├── images/                # All images
+│   ├── logo.png
+│   ├── favicon.ico
+│   ├── icons/             # PWA icons
+│   │   ├── icon-192x192.png
+│   │   └── icon-512x512.png
+│   └── screenshots/       # App screenshots
+└── assets/                # Other static files
+    ├── data.json
+    └── fonts/
+```
+
+### Migration Pattern
+
+**When you find assets in wrong locations:**
+
+```bash
+# 1. Create proper structure
+mkdir -p public/images public/assets
+
+# 2. Move misplaced assets
+mv image/* public/images/          # Root image/ directory
+mv src/assets/* public/assets/     # Assets in src/
+mv *.png public/images/            # Root-level images
+
+# 3. Remove empty directories
+rmdir image src/assets
+
+# 4. Update any hardcoded references (rare if using absolute paths)
+# Search for: "image/", "../assets/", etc.
+```
+
+**Real Example: MealPlanner Fix**
+```bash
+# Found: /image/ directory with 9 logo/branding images
+# Fixed: Moved to /public/images/
+mv image/* public/images/
+rmdir image
+# Result: Consistent with /src → /public → /docs pattern
+```
 
 ---
 
