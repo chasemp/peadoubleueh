@@ -1,5 +1,11 @@
 import { defineConfig } from 'vite'
-import { resolve } from 'path'
+import { resolve, dirname } from 'path'
+import { copyFileSync } from 'fs'
+import { fileURLToPath } from 'url'
+
+// ES modules don't have __dirname, so we create it
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 /**
  * BUILD SYSTEM (DEPLOYMENT MODEL):
@@ -26,6 +32,23 @@ import { resolve } from 'path'
  * ⚠️  CRITICAL: Never edit files in /docs manually - they are auto-generated!
  */
 
+// Plugin to copy service worker to output root
+function copyServiceWorker() {
+  return {
+    name: 'copy-service-worker',
+    closeBundle: async () => {
+      const swSource = resolve(__dirname, 'src/sw.js')
+      const swDest = resolve(__dirname, '../../docs/sw.js')
+      try {
+        copyFileSync(swSource, swDest)
+        console.log('✅ Service worker copied to output directory')
+      } catch (error) {
+        console.error('❌ Failed to copy service worker:', error)
+      }
+    }
+  }
+}
+
 export default defineConfig({
   // Serve app files from `src/` during development
   root: 'src',
@@ -35,8 +58,8 @@ export default defineConfig({
   base: './',
   build: {
     // Output into /docs directory at repository root for GitHub Pages deployment
-    // Note: Relative to 'root' (src/pwa-template/src/), so ../../../docs = repo root /docs
-    outDir: '../../../docs',
+    // Note: Relative to 'root' (src/pwa-template/src/), so ../../docs = repo root /docs
+    outDir: '../../docs',
     // Safe to empty /docs since it only contains built files
     emptyOutDir: true,
     assetsDir: 'assets',
@@ -46,6 +69,9 @@ export default defineConfig({
       }
     }
   },
+  plugins: [
+    copyServiceWorker()
+  ],
   server: {
     port: 3000,
     host: '0.0.0.0',
