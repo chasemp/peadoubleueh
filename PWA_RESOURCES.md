@@ -10,6 +10,11 @@
 2. [Official Documentation](#official-documentation)
 3. [Our Documentation](#our-documentation)
 4. [Tools & Utilities](#tools--utilities)
+   - [Icon Generators](#icon-generators)
+   - [Service Worker Generators](#service-worker-generators)
+   - [Testing Tools](#testing-tools)
+   - [Performance Tools](#performance-tools)
+   - [Design & Color Tools](#design--color-tools)
 5. [Learning Resources](#learning-resources)
 6. [Real-World Examples](#real-world-examples)
 7. [Community & Support](#community--support)
@@ -214,6 +219,33 @@ Test performance from different locations and devices.
 
 **[PageSpeed Insights](https://pagespeed.web.dev/)**
 Google's performance analyzer with actionable recommendations.
+
+---
+
+### **Design & Color Tools**
+
+**[ColorHunt](https://colorhunt.co/)** ⭐
+Discover beautiful, hand-picked color palettes for your PWA
+
+**Features:**
+- ✅ Thousands of curated color palettes
+- ✅ Search by color, mood, or season (Pastel, Vintage, Retro, Neon, etc.)
+- ✅ Browse by theme (Nature, Earth, Night, Food, Coffee, Wedding)
+- ✅ Popular palettes sorted by New/Popular/Trending
+- ✅ Copy hex codes instantly
+- ✅ Like and save favorite palettes
+- ✅ Chrome extension available
+
+**Browse by category:**
+- **Colors:** Blue, Teal, Mint, Green, Sage, Yellow, Beige, Brown, Orange, Peach, Red, Maroon, Pink, Purple, Navy, Black, Grey, White
+- **Moods:** Pastel, Vintage, Retro, Neon, Gold, Light, Dark, Warm, Cold
+- **Seasons:** Summer, Fall, Winter, Spring
+- **Themes:** Happy, Nature, Earth, Night, Space, Rainbow, Gradient, Sunset, Sky, Sea, Kids, Skin, Food, Cream, Coffee
+- **Events:** Wedding, Christmas, Halloween
+
+**Use case:** Perfect for selecting cohesive color schemes for your PWA theme (light & dark modes). Find professional-looking palettes that complement each other.
+
+**Pro tip:** Use ColorHunt to pick your `manifest.json` theme_color and design a complete light/dark mode palette that creates a cohesive user experience.
 
 ---
 

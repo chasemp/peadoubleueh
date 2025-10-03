@@ -100,7 +100,17 @@ class CacheBustingManager {
       if ('serviceWorker' in navigator) {
         const registration = await navigator.serviceWorker.getRegistration();
         if (registration) {
-          await registration.update();
+          try {
+            await registration.update();
+          } catch (updateError) {
+            // Handle InvalidStateError - service worker is in bad state
+            if (updateError.name === 'InvalidStateError') {
+              logger.warn('⚠️ Service worker in invalid state, attempting recovery...');
+              await this.recoverServiceWorker();
+              return { success: false, error: 'Service worker recovered, refresh page' };
+            }
+            throw updateError;
+          }
         }
       }
       
@@ -113,6 +123,29 @@ class CacheBustingManager {
     } catch (error) {
       logger.error('Service Worker Version Bump failed:', error);
       return { success: false, error: error.message };
+    }
+  }
+
+  async recoverServiceWorker() {
+    try {
+      // Unregister all service workers
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      for (const registration of registrations) {
+        await registration.unregister();
+        logger.log('🗑️ Unregistered old service worker');
+      }
+      
+      // Wait a bit for cleanup
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Re-register the service worker
+      await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+      logger.log('✅ Service worker re-registered successfully');
+      
+      return true;
+    } catch (error) {
+      logger.error('❌ Service worker recovery failed:', error);
+      return false;
     }
   }
 

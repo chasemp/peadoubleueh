@@ -7,12 +7,13 @@
 ## 📋 Table of Contents
 
 1. [Essential Code Patterns](#essential-code-patterns)
-2. [Quick Troubleshooting](#quick-troubleshooting)
-3. [Mobile Touch Events](#mobile-touch-events)
-4. [PWA Setup Checklist](#pwa-setup-checklist)
-5. [Deployment Quick Reference](#deployment-quick-reference)
-6. [Common Mistakes](#common-mistakes)
-7. [Key Takeaways](#key-takeaways)
+2. [Theming & Color Palettes](#theming--color-palettes)
+3. [Quick Troubleshooting](#quick-troubleshooting)
+4. [Mobile Touch Events](#mobile-touch-events)
+5. [PWA Setup Checklist](#pwa-setup-checklist)
+6. [Deployment Quick Reference](#deployment-quick-reference)
+7. [Common Mistakes](#common-mistakes)
+8. [Key Takeaways](#key-takeaways)
 
 ---
 
@@ -184,6 +185,288 @@ addHapticFeedback() {
         max-height: 85vw;
     }
 }
+```
+
+---
+
+## 🎨 Theming & Color Palettes
+
+### Choosing Color Palettes
+
+**Use [ColorHunt.co](https://colorhunt.co/)** to discover professional color palettes:
+- Search by color, mood, or season
+- Find complementary palettes for light & dark modes
+- Copy hex codes instantly
+- Browse: Nature, Earth, Food themes work well for PWAs
+
+**Pro tip:** Pick two palettes from ColorHunt:
+1. **Light mode:** Bright, airy colors (Sage, Pastel, Spring themes)
+2. **Dark mode:** Deep, rich colors (Earth, Night themes)
+
+Ensure they share a common color family for cohesion.
+
+---
+
+### Tailwind Color Configuration
+
+**✅ CORRECT: Use semantic color names for easy theme changes**
+
+```javascript
+// tailwind.config.js
+export default {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        // Define a flexible primary palette (50-900)
+        primary: {
+          50: '#E1EEBC',   // Lightest
+          100: '#d4e8b0',
+          200: '#b8dda0',
+          300: '#90C67C',
+          400: '#7ab970',
+          500: '#67AE6E',  // Main brand color
+          600: '#5a9d63',
+          700: '#4d8b58',
+          800: '#328E6E',
+          900: '#2a7459',  // Darkest
+        },
+        // Optional: Alias for convenience
+        sage: {
+          DEFAULT: '#67AE6E',
+          light: '#90C67C',
+          lighter: '#E1EEBC',
+          dark: '#328E6E',
+        },
+        // Dark mode specific colors
+        dark: {
+          bg: '#432323',       // Main background
+          surface: '#2F5755',  // Cards, nav
+          accent: '#5A9690',   // Highlights
+          text: '#E0D9D9',     // Text color
+        }
+      }
+    },
+  },
+}
+```
+
+**❌ WRONG: Hardcoding color names in HTML**
+```html
+<!-- DON'T do this -->
+<button class="bg-blue-500 hover:bg-blue-600">Click</button>
+
+<!-- DO this instead -->
+<button class="bg-primary-500 hover:bg-primary-600">Click</button>
+```
+
+---
+
+### Complete Theme Implementation Checklist
+
+When implementing a new color theme, update **all** of these:
+
+#### 1. Tailwind Configuration
+```javascript
+// tailwind.config.js
+colors: {
+  primary: { /* your palette */ }
+}
+```
+
+#### 2. HTML Classes (Use Find & Replace)
+```bash
+# Replace all color-specific classes with semantic ones
+bg-blue-500     → bg-primary-500
+text-blue-600   → text-primary-600
+border-blue-400 → border-primary-400
+hover:bg-blue-  → hover:bg-primary-
+focus:ring-blue → focus:ring-primary
+```
+
+#### 3. Custom CSS Files
+```css
+/* src/styles/styles.css */
+.btn-primary {
+    background-color: #67AE6E; /* Use your primary-500 */
+}
+
+.calendar-day.drag-over {
+    background-color: rgba(103, 174, 110, 0.1); /* primary with opacity */
+    border-color: #67AE6E;
+}
+
+/* Dark mode overrides */
+.dark .mobile-nav {
+    background-color: rgba(47, 87, 85, 0.95); /* dark-surface */
+}
+```
+
+#### 4. PWA Manifest
+```json
+{
+  "theme_color": "#67AE6E",
+  "background_color": "#ffffff"
+}
+```
+
+#### 5. HTML Meta Tags
+```html
+<meta name="theme-color" content="#67AE6E">
+<meta name="msapplication-TileColor" content="#67AE6E">
+```
+
+#### 6. Rebuild CSS
+```bash
+npm run build:css
+```
+
+---
+
+### Dark Mode Color Strategy
+
+**Key principle:** Dark mode needs its own palette, not just inverted colors.
+
+```javascript
+// Good dark mode palette strategy
+colors: {
+  // Light mode uses primary-*
+  primary: { 500: '#67AE6E' },  // Sage green
+  
+  // Dark mode uses dedicated dark-* colors
+  dark: {
+    bg: '#432323',      // Warm brown (not pure black)
+    surface: '#2F5755', // Teal (elevated surfaces)
+    accent: '#5A9690',  // Lighter teal (interactive)
+    text: '#E0D9D9',    // Off-white (easier on eyes)
+  }
+}
+```
+
+**Apply in CSS:**
+```css
+/* Light mode - default */
+.card {
+    background: white;
+    color: #1a1a1a;
+}
+
+/* Dark mode - dedicated palette */
+.dark .card {
+    background: #2F5755; /* dark-surface, not just inverted white */
+    color: #E0D9D9;      /* dark-text, not pure white */
+}
+```
+
+---
+
+### Common Theming Mistakes
+
+#### ❌ Forgetting to rebuild CSS after config changes
+```bash
+# Always rebuild after changing tailwind.config.js
+npm run build:css
+```
+
+#### ❌ Using color-specific classes in HTML
+```html
+<!-- BAD: Hard to change theme later -->
+<div class="bg-blue-500 text-white">
+
+<!-- GOOD: Semantic, easy to retheme -->
+<div class="bg-primary-500 text-white">
+```
+
+#### ❌ Incomplete color replacement
+```html
+<!-- Missed this one! -->
+<div class="bg-primary-500 border-blue-300">
+     <!--                  ↑ Still blue! -->
+```
+
+**Solution:** Use global find/replace for all variants:
+- `bg-blue-`, `text-blue-`, `border-blue-`
+- `hover:bg-blue-`, `focus:ring-blue-`
+- Check JS files too for dynamic class generation
+
+#### ❌ Not updating custom CSS
+```css
+/* styles.css still has old colors! */
+.btn-primary {
+    background: #3b82f6; /* Old blue */
+}
+```
+
+#### ❌ Dark mode as afterthought
+```css
+/* BAD: Just inverting colors looks wrong */
+.dark body {
+    background: #000000; /* Pure black - harsh! */
+    color: #ffffff;      /* Pure white - harsh! */
+}
+
+/* GOOD: Dedicated dark palette */
+.dark body {
+    background: #1a1f2e; /* Dark blue-gray */
+    color: #e1e4e8;      /* Soft white */
+}
+```
+
+---
+
+### Quick Theme Testing
+
+**Test both modes immediately:**
+```javascript
+// Add theme toggle to your dev environment
+localStorage.setItem('theme', 'dark');
+location.reload();
+
+localStorage.setItem('theme', 'light');
+location.reload();
+```
+
+**Visual audit checklist:**
+- [ ] All buttons use new color
+- [ ] Active states (hover, focus) use new color
+- [ ] Loading spinners use new color
+- [ ] Form inputs (checkboxes, focus rings) use new color
+- [ ] Links and accents use new color
+- [ ] Dark mode has dedicated palette (not just inverted)
+- [ ] Manifest theme_color matches UI
+- [ ] Meta tag theme-color matches UI
+
+---
+
+### Real-World Example: MealPlanner Theme
+
+```javascript
+// 1. Found palettes on ColorHunt
+// Light: Sage greens (#67AE6E, #90C67C, #E1EEBC)
+// Dark: Teal + brown (#2F5755, #5A9690, #432323)
+
+// 2. Updated tailwind.config.js
+colors: {
+  primary: { 500: '#67AE6E', /* ...full scale */ },
+  dark: { bg: '#432323', surface: '#2F5755', accent: '#5A9690' }
+}
+
+// 3. Find/replace in HTML
+// bg-blue-500 → bg-primary-500 (16 replacements)
+// text-blue-600 → text-primary-600 (8 replacements)
+// etc.
+
+// 4. Updated custom CSS
+.btn-primary { background: #67AE6E; }
+.dark .calendar { background: #2F5755; }
+
+// 5. Updated manifest + meta tags
+"theme_color": "#67AE6E"
+
+// 6. Rebuilt CSS
+npm run build:css
+
+// Result: Complete theme change in <10 minutes! 🎉
 ```
 
 ---
