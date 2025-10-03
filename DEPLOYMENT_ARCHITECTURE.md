@@ -261,6 +261,86 @@ npm run build     # Copies to docs/CNAME
 
 ---
 
+### Build Metadata Files (build, build-info.json)
+
+**Problem:** Build metadata files contain timestamps that change on every build, causing commit churn.
+
+#### The Pattern
+
+```
+BUILD PROCESS GENERATES:
+/build                  ← Version string with timestamp
+/build-info.json        ← Full build metadata (JSON)
+/src/build-info.json    ← Source copy (if needed by app)
+
+PRE-COMMIT HOOK COPIES TO:
+/docs/build             ← Committed (for deployment)
+/docs/build-info.json   ← Committed (for deployment)
+
+GITIGNORED (to prevent churn):
+/build                  ← Changes every build
+/build-info.json        ← Changes every build  
+/src/build-info.json    ← Changes every build
+```
+
+#### Why This Works
+
+**Without this pattern:**
+```bash
+$ git status
+modified: build              # Timestamp: 2025-10-03 09:56:42
+modified: build-info.json    # Every commit!
+```
+
+**With this pattern:**
+```bash
+$ git status
+nothing to commit, working tree clean  # ✅ Clean!
+```
+
+#### How It Works
+
+1. **Build generates metadata** in root (gitignored)
+2. **Pre-commit hook copies** to `/docs` (committed)
+3. **App reads from** `/docs/build-info.json` in production
+4. **Git never sees** the root files (clean commits)
+
+#### Configuration
+
+**`.gitignore`:**
+```bash
+# Build metadata (auto-generated, copied to /docs by hook)
+/build
+/build-info.json
+/src/build-info.json
+```
+
+**Pre-commit hook:**
+```bash
+# Copy build metadata to /docs for deployment
+cp build docs/build 2>/dev/null || true
+cp build-info.json docs/build-info.json 2>/dev/null || true
+git add docs/
+```
+
+#### Why Not Just Commit Root Files?
+
+❌ **Bad:** Every commit changes timestamps
+```bash
+git commit -m "Fix typo"
+# Also commits: build (timestamp), build-info.json (timestamp)
+# Result: Noise in git history, merge conflicts
+```
+
+✅ **Good:** Only commit when deployed
+```bash
+git commit -m "Fix typo"  
+# Hook builds fresh, copies to /docs
+# Result: /docs updated, root clean
+```
+
+---
+
 ## Implementation Guide
 
 ### Step 1: Configure Build Tool (Vite)
