@@ -95,13 +95,13 @@ class PWAApp {
       this.themeManager.toggleTheme();
     });
     
-    // Settings modal
+    // Settings page navigation
     document.getElementById('settings-btn')?.addEventListener('click', () => {
-      this.showSettingsModal();
+      this.showPage('settings');
     });
     
-    document.getElementById('close-settings')?.addEventListener('click', () => {
-      this.hideSettingsModal();
+    document.getElementById('back-btn')?.addEventListener('click', () => {
+      this.showPage('main');
     });
     
     // Install prompt
@@ -304,24 +304,56 @@ class PWAApp {
     themeToggle.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
   }
 
-  // Settings Modal
-  showSettingsModal() {
-    const modal = document.getElementById('settings-modal');
-    if (modal) {
-      modal.style.display = 'flex';
+  // Page Navigation (Mobile-First Pattern)
+  showPage(pageName) {
+    const mainContent = document.getElementById('content');
+    const settingsPage = document.getElementById('settings-page');
+    const backBtn = document.getElementById('back-btn');
+    const pageTitle = document.getElementById('page-title');
+    const settingsBtn = document.getElementById('settings-btn');
+    
+    if (pageName === 'settings') {
+      // Show settings page
+      mainContent.style.display = 'none';
+      settingsPage.style.display = 'block';
+      backBtn.style.display = 'block';
+      settingsBtn.style.display = 'none';
+      pageTitle.textContent = 'Settings';
       this.loadSettings();
-    }
-  }
-
-  hideSettingsModal() {
-    const modal = document.getElementById('settings-modal');
-    if (modal) {
-      modal.style.display = 'none';
+      
+      // Scroll to top
+      window.scrollTo(0, 0);
+    } else {
+      // Show main page
+      mainContent.style.display = 'block';
+      settingsPage.style.display = 'none';
+      backBtn.style.display = 'none';
+      settingsBtn.style.display = 'block';
+      pageTitle.textContent = 'PWA Template';
+      
+      // Scroll to top
+      window.scrollTo(0, 0);
     }
   }
 
   loadSettings() {
     const settings = this.storageManager.getSettings();
+    
+    // Load build version
+    fetch('/build-info.json')
+      .then(res => res.json())
+      .then(data => {
+        const buildEl = document.getElementById('build-version');
+        if (buildEl) {
+          buildEl.textContent = data.build || 'Unknown';
+        }
+      })
+      .catch(() => {
+        const buildEl = document.getElementById('build-version');
+        if (buildEl) {
+          buildEl.textContent = 'Development';
+        }
+      });
     
     // Update theme select
     const themeSelect = document.getElementById('theme-select');
