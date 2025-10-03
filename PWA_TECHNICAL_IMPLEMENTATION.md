@@ -317,6 +317,238 @@ Watch for these warning signs in PWA architecture:
 - [ ] Design state management strategy
 - [ ] Plan testing strategy (unit + integration)
 
+---
+
+## 🔄 **PWA Refactoring: From Monolith to Modular Architecture**
+
+### **Real-World Refactoring Case Study: Blockdoku PWA**
+
+*This section documents a complete refactoring of a 3,741-line monolithic PWA into a clean, modular architecture while maintaining 100% behavioral compatibility.*
+
+#### **The Challenge**
+- **3,741-line monolithic app.js** with mixed concerns
+- **15+ manager dependencies** all instantiated in constructor
+- **Untestable code** requiring full DOM setup
+- **Merge conflicts** on every feature addition
+- **Performance issues** from unnecessary instantiation
+
+#### **The Solution: Testing-First Refactoring**
+
+**Critical Success Factor: Comprehensive Testing**
+> **"Never refactor without comprehensive tests. The confidence to change code comes from the certainty that you haven't broken anything."**
+
+##### **Phase 1: Characterization Tests (Behavior Capture)**
+```javascript
+// BEFORE refactoring - capture CURRENT behavior
+test('Complete placement workflow', () => {
+    const gameEngine = new SimpleGameLogic();
+    
+    // Fill row except last position
+    for (let col = 0; col < 8; col++) {
+        gameEngine.board[0][col] = 1;
+    }
+    
+    const block = testScenarios.blocks.single;
+    const newBoard = gameEngine.placeBlockOnBoard(block, board, 0, 8);
+    
+    // Verify EXACT current behavior
+    const completedLines = gameEngine.findCompletedLines(newBoard);
+    assertEqual(completedLines.rows.length, 1, 'Should complete one row');
+    
+    const score = gameEngine.calculateClearScore(completedLines);
+    assertEqual(score, 18, 'Should give exactly 18 points');
+});
+```
+
+**Purpose:** Document what the system CURRENTLY does (not what it should do)
+**Benefit:** Provides safety net during architectural changes
+
+##### **Phase 2: Component Unit Tests (Isolated Verification)**
+```javascript
+// AFTER extraction - verify component works identically
+test('GameEngine maintains exact same behavior', () => {
+    const gameEngine = new GameEngine();
+    
+    // Same test scenario as characterization test
+    const result = gameEngine.placeBlock(block, { row: 0, col: 8 });
+    
+    // Must produce IDENTICAL results
+    assertEqual(result.scoreGained, 20, 'Total score should be 2 + 18 = 20');
+    assertEqual(result.clearResult.clearedLines.rows.length, 1, 'Should clear one row');
+});
+```
+
+**Purpose:** Ensure extracted components behave identically to original
+**Benefit:** Catch regressions immediately during refactoring
+
+##### **Phase 3: Integration Tests (System Verification)**
+```javascript
+// AFTER integration - verify system still works end-to-end
+test('Full game workflow maintains behavior', () => {
+    const container = new DependencyContainer();
+    const gameEngine = container.resolve('gameEngine');
+    const uiManager = container.resolve('uiManager');
+    
+    // Test complete user workflow
+    const result = simulateGameSession(gameEngine, uiManager);
+    
+    // Verify system behavior unchanged
+    assert(result.success, 'Game workflow should complete successfully');
+});
+```
+
+**Purpose:** Verify refactored architecture works as a complete system
+**Benefit:** Ensure component integration doesn't break user workflows
+
+#### **Refactoring Results**
+
+**Before Refactoring:**
+```
+app.js (3,741 lines)
+├── Game logic mixed with UI
+├── 15+ manager dependencies
+├── Untestable code
+├── Merge conflicts on every change
+└── Performance bottlenecks
+```
+
+**After Refactoring:**
+```
+BlockdokuGame (400 lines)
+├── DependencyContainer - Manages all dependencies
+├── GameEngine - Pure game logic (500 lines)
+├── UIManager - Rendering and DOM (400 lines)
+├── StateManager - Centralized state (400 lines)
+└── GameStorage - Persistence layer (existing)
+```
+
+**Metrics:**
+- **3,741 → 400 lines** - Reduced monolithic app.js by 89%
+- **66 Total Tests** - 100% pass rate throughout refactoring
+- **Zero Breaking Changes** - All original functionality maintained
+- **Modular Architecture** - 4 focused, testable components
+
+#### **Key Refactoring Lessons**
+
+##### **1. Testing Foundation is Critical**
+- **24 Characterization Tests** captured current behavior
+- **32 Unit Tests** verified component isolation
+- **10 Integration Tests** ensured system coherence
+- **100% Pass Rate** maintained throughout entire process
+
+##### **2. Extract Gradually, Test Continuously**
+```
+1. Write Characterization Tests → Capture current behavior
+2. Run Tests → Establish baseline (must be 100% pass)
+3. Extract Component → Create new architecture
+4. Write Component Tests → Verify identical behavior  
+5. Run All Tests → Ensure no regressions
+6. Integrate Component → Wire into system
+7. Run Integration Tests → Verify system works
+8. Repeat → Next component extraction
+```
+
+##### **3. Dependency Injection Enables Testing**
+```javascript
+// ❌ BAD - Hard to test
+class GameEngine {
+    constructor() {
+        this.storage = new GameStorage(); // Hard dependency
+        this.audio = new AudioManager();  // Hard dependency
+    }
+}
+
+// ✅ GOOD - Easy to test
+class GameEngine {
+    constructor(dependencies) {
+        this.storage = dependencies.storage; // Injected
+        this.audio = dependencies.audio;     // Injected
+    }
+}
+```
+
+##### **4. State Management Centralization**
+```javascript
+// ❌ BAD - State scattered everywhere
+class GameEngine {
+    constructor() {
+        this.score = 0;
+        this.level = 1;
+        // State mixed with logic
+    }
+}
+
+class UIManager {
+    constructor() {
+        this.isDragging = false;
+        this.selectedBlock = null;
+        // UI state separate from game state
+    }
+}
+
+// ✅ GOOD - Centralized state management
+class StateManager {
+    constructor() {
+        this.gameState = { score: 0, level: 1, /* ... */ };
+        this.uiState = { isDragging: false, selectedBlock: null };
+    }
+    
+    updateGameState(updates) {
+        this.gameState = { ...this.gameState, ...updates };
+        this.notifyObservers('gameState', this.gameState);
+    }
+}
+```
+
+#### **Testing Anti-Patterns That Lead to Refactoring Failure**
+
+##### **❌ Anti-Pattern 1: "Test What Should Happen" Instead of "What Currently Happens"**
+```javascript
+// WRONG - Testing ideal behavior during refactoring
+test('Score calculation', () => {
+    assertEqual(calculateScore(block), 10, 'Should give 10 points'); // Wishful thinking
+});
+
+// RIGHT - Testing current behavior during refactoring
+test('Score calculation (current behavior)', () => {
+    assertEqual(calculateScore(block), 7, 'Currently gives 7 points'); // Actual behavior
+});
+```
+
+##### **❌ Anti-Pattern 2: "Refactor First, Test Later"**
+```javascript
+// WRONG - Refactoring without safety net
+class NewGameEngine {
+    // Refactored code with no verification it works the same
+    placeBlock(block, position) {
+        // Hope this works the same as before...
+        return this.newImprovedLogic(block, position);
+    }
+}
+```
+
+##### **❌ Anti-Pattern 3: "Only Test Happy Paths"**
+```javascript
+// WRONG - Missing edge cases
+test('Block placement', () => {
+    assert(placeBlock(validBlock, validPosition), 'Should place valid block');
+    // Missing: invalid blocks, boundary conditions, error cases
+});
+
+// RIGHT - Comprehensive behavior capture
+test('Block placement edge cases', () => {
+    assert(placeBlock(validBlock, outOfBounds), 'Should reject out of bounds');
+    assert(!placeBlock(null, validPosition), 'Should reject null block');
+    assert(!placeBlock(validBlock, collision), 'Should reject collisions');
+});
+```
+
+#### **The Bottom Line**
+
+> **"This refactoring succeeded because we had 66 tests providing a safety net. Without them, we would have been flying blind through 3,741 lines of complex code. The tests didn't just verify our refactoring worked - they made the refactoring possible in the first place."**
+
+**Every future PWA project should budget 30-40% of refactoring time for comprehensive testing. It's not overhead - it's the foundation that makes safe architectural evolution possible.**
+
 #### **During Development:**
 - [ ] Keep components under 500 lines
 - [ ] Write tests for business logic first

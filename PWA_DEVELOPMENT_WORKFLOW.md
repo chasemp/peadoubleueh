@@ -250,11 +250,16 @@ test('Block placement edge cases', () => {
 ### **Metrics That Prove Testing Effectiveness**
 
 Our refactoring achieved:
-- **26 Total Tests** with **100% Pass Rate** throughout entire process
+- **66 Total Tests** with **100% Pass Rate** throughout entire process
 - **0 Behavioral Regressions** detected during refactoring
-- **3,741 → 1,200 lines** of monolithic code successfully extracted
-- **<10 second test runtime** enabling rapid feedback
+- **3,741 → 400 lines** of monolithic code successfully extracted (89% reduction)
+- **<15 second test runtime** enabling rapid feedback
 - **Confidence to Refactor** - No fear of breaking existing functionality
+
+**Test Breakdown:**
+- **24 Characterization Tests** - Captured current behavior before refactoring
+- **32 Unit Tests** - Verified component isolation after extraction
+- **10 Integration Tests** - Ensured system coherence after integration
 
 ### **The Cost of Inadequate Testing**
 
@@ -285,9 +290,30 @@ Our refactoring achieved:
 
 ### **The Bottom Line**
 
-> **"This refactoring succeeded because we had 26 tests providing a safety net. Without them, we would have been flying blind through 3,741 lines of complex code. The tests didn't just verify our refactoring worked - they made the refactoring possible in the first place."**
+> **"This refactoring succeeded because we had 66 tests providing a safety net. Without them, we would have been flying blind through 3,741 lines of complex code. The tests didn't just verify our refactoring worked - they made the refactoring possible in the first place."**
 
 **Every future PWA project should budget 30-40% of refactoring time for comprehensive testing. It's not overhead - it's the foundation that makes safe architectural evolution possible.**
+
+### **Real-World Refactoring Success Story**
+
+**Project:** Blockdoku PWA Refactoring
+**Challenge:** Transform 3,741-line monolithic app into modular architecture
+**Solution:** Testing-first refactoring with comprehensive test coverage
+**Result:** 89% code reduction, zero breaking changes, 100% test pass rate
+
+**Key Success Factors:**
+1. **Characterization Tests First** - Captured existing behavior before any changes
+2. **Component-by-Component Extraction** - One component at a time with tests
+3. **Continuous Integration Testing** - Verified system coherence after each step
+4. **Behavior Preservation Focus** - Never changed functionality, only structure
+5. **Comprehensive Edge Case Coverage** - Tested error conditions and boundary cases
+
+**Lessons for Future Projects:**
+- Start every refactoring with characterization tests
+- Budget 30-40% of time for testing infrastructure
+- Test current behavior, not ideal behavior
+- Maintain 100% test pass rate throughout process
+- Use tests as living documentation of system behavior
 
 #### **Testing Pattern for Constructors with Side Effects**
 ```javascript
@@ -1481,6 +1507,223 @@ navigator.serviceWorker.register('/sw.js');
 ---
 
 ## 🚀 Project Setup & Deployment
+
+### **Critical: The /src → /docs Deployment Pattern**
+
+**The #1 architectural mistake we made across multiple PWA projects:**  
+Mixing source and built files in the same directory.
+
+#### The Problem
+
+Early PWA projects built directly to the repository root, causing:
+- **Lost work** - editing built files instead of source
+- **Deployment confusion** - live site serving stale builds
+- **Circular debugging** - "bugs" that were just old builds
+- **Commit churn** - build timestamps changing constantly
+- **PR chaos** - fixing "issues" that were deployment problems
+
+**Example symptom:** PR about "missing feature" when feature existed in source but wasn't built/deployed.
+
+#### The Solution: Clear Source/Build Separation
+
+```
+your-pwa/
+├── src/                    # ✅ SOURCE - Edit here
+│   ├── index.html
+│   ├── js/
+│   ├── css/
+│   └── assets/
+│
+├── docs/                   # 🤖 BUILD OUTPUT - Auto-generated
+│   ├── index.html          # Built from src/
+│   ├── assets/             # Bundled JS/CSS
+│   ├── build               # Build version for cache debugging
+│   └── build-info.json     # Build metadata
+│
+├── public/                 # Static assets (copied to /docs)
+│   ├── manifest.json
+│   ├── icons/
+│   └── favicon.ico
+│
+├── .gitignore             # Ignore /build, /build-info.json
+├── .gitattributes         # Mark /docs as generated
+├── .cursorrules           # Warn AI about /docs
+└── vite.config.js         # Build /src → /docs
+```
+
+#### Build Configuration (vite.config.js)
+
+```javascript
+export default {
+  root: 'src',              // Serve from /src in dev
+  publicDir: '../public',   // Static assets
+  build: {
+    outDir: '../docs',      // Build to /docs
+    emptyOutDir: true,      // Safe to empty (only generated files)
+    rollupOptions: {
+      input: {
+        main: 'src/index.html',
+        settings: 'src/settings.html'
+        // ... other entry points
+      }
+    }
+  },
+  server: {
+    port: 3456
+  }
+}
+```
+
+#### Pre-Commit Hook (Automate Everything)
+
+```bash
+#!/bin/bash
+# .git/hooks/pre-commit
+
+set -e  # Exit on any error
+
+echo "🧪 Running critical regression tests..."
+npm test  # Or your test command
+
+echo "🔨 Building /src → /docs..."
+npm run build --silent
+
+# Copy build metadata for cache debugging
+if [ -f build ]; then
+    cp build docs/build
+fi
+if [ -f build-info.json ]; then
+    cp build-info.json docs/build-info.json
+fi
+
+# Stage built files
+git add docs/
+
+echo "✅ Tests passed and /docs built!"
+```
+
+**Result:** Can't forget to build, can't commit broken code, working directory stays clean.
+
+#### Build Metadata Strategy
+
+**Problem:** Build files (`build`, `build-info.json`) change every commit (timestamps) → endless commit churn.
+
+**Solution:**
+```
+/build                  → Gitignored (generated, not committed)
+/build-info.json        → Gitignored (generated, not committed)
+/docs/build             → Committed (for deployed cache debugging)
+/docs/build-info.json   → Committed (for deployed app metadata)
+```
+
+Pre-commit hook copies root → docs, only docs versions are committed.
+
+#### Protection Layers (4 Layers to Prevent Mistakes)
+
+1. **`.gitattributes`** - Mark as generated
+   ```
+   docs/** linguist-generated=true
+   docs/** text eol=lf
+   ```
+
+2. **`.cursorrules`** - Warn AI assistants
+   ```
+   # CRITICAL: DO NOT EDIT /docs - AUTO-GENERATED
+   # Edit /src instead, then run 'npm run build'
+   ```
+
+3. **HTML Comments** - Warn humans
+   ```html
+   <!--
+   ⚠️  AUTO-GENERATED FILE - DO NOT EDIT MANUALLY! ⚠️
+   This file was generated from /src
+   Edit /src/index.html and run 'npm run build'
+   -->
+   ```
+
+4. **Documentation** - Make it impossible to be confused
+   - `QUICK_START.md` in repository
+   - This guide
+   - README with clear instructions
+
+**Note:** Do NOT use filesystem read-only protection - it breaks git operations (pull, rebase, merge).
+
+#### GitHub Pages Configuration
+
+1. Go to repo Settings → Pages
+2. Source: Deploy from a branch
+3. Branch: `main`
+4. Folder: `/docs` ← **Critical setting**
+5. Custom domain: your-domain.com (optional)
+
+**No GitHub Actions needed** - Pages serves /docs directly.
+
+#### Daily Workflow
+
+```bash
+# 1. Edit source (only edit /src!)
+vim src/index.html
+
+# 2. Test locally
+npm run dev  # → http://localhost:3456
+
+# 3. Commit (hook auto-builds)
+git add src/
+git commit -m "Add feature"  # ← Tests + build happen here
+
+# 4. Push to deploy
+git push  # → Live in ~2 minutes
+```
+
+**Post-commit:** `git status` should show clean working directory. If not, something's wrong.
+
+#### Troubleshooting
+
+**Issue:** Live site doesn't match code
+```bash
+# Check if /docs is up-to-date
+git status
+
+# Rebuild manually if needed
+npm run build
+git add docs/
+git commit -m "Update /docs"
+git push
+```
+
+**Issue:** Pre-commit hook fails
+```bash
+# See errors
+npm run build
+
+# Fix issue, commit again
+```
+
+**Issue:** Git complains about /docs permissions
+```bash
+# Make writable (if you added read-only protection - don't!)
+chmod -R u+w docs/
+
+# Retry git operation
+```
+
+#### Why This Matters
+
+**Before this pattern:**
+- Weeks lost to deployment confusion
+- Multiple PRs fixing "bugs" that were stale builds
+- Constant wondering "which file is the latest?"
+- Build metadata causing commit noise
+
+**After this pattern:**
+- Clear mental model: source vs build
+- Automatic builds, can't forget
+- Clean commits, no build churn
+- Reliable deployments
+
+**This is the most important architectural pattern for PWAs.**
+
+---
 
 ### Development Checklist
 
