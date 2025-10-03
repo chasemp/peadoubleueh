@@ -189,6 +189,67 @@ addHapticFeedback() {
 
 ---
 
+## 🧪 Testing & Quality Assurance
+
+### Two-Track Testing Strategy
+
+#### Track 1: Behavioral Tests (Fast JS)
+```bash
+npm run test:behavioral          # CLI runner
+npm run test:behavioral:browser  # Browser UI
+npm run test:critical           # Pre-commit tests
+```
+
+#### Track 2: MCP Playwright (Real Browser)
+```bash
+npm run test:e2e:execute        # Automated execution
+npm run test:mcp:commands       # Generate commands
+npm run test:mcp:generate       # Generate test files
+```
+
+### Test Structure
+```
+tests/
+├── behavioral/     # Track 1: Fast regression tests
+├── playwright/     # Track 2: MCP Playwright automation
+├── unit/          # Component isolation tests
+├── integration/   # Cross-component tests  
+└── characterization/ # Refactoring safety nets
+```
+
+### Quick Test Setup
+
+**Behavioral Test Example:**
+```javascript
+test('Settings: Theme change preserves difficulty (REGRESSION)', async () => {
+    const settings = new SettingsManager();
+    const difficulty = new DifficultyManager();
+    
+    settings.setTheme('wood');
+    difficulty.setDifficulty('hard');
+    settings.setTheme('light');  // Action
+    
+    assertEqual(difficulty.getCurrentDifficulty(), 'hard');
+});
+```
+
+**MCP Playwright Command:**
+```javascript
+{
+    name: 'Click Light Theme Button',
+    command: 'mcp_playwright_browser_click',
+    params: { element: 'Light theme button', ref: '#theme-light' }
+}
+```
+
+**When to Use Each:**
+- **Behavioral**: Regression prevention, fast feedback, component isolation
+- **MCP Playwright**: Cross-page workflows, visual verification, mobile interactions
+
+**Full guide:** [Development Workflow - Advanced Testing Patterns](/project-docs/PWA_DEVELOPMENT_WORKFLOW.md#advanced-testing-patterns)
+
+---
+
 ## 🎨 Theming & Color Palettes
 
 ### Choosing Color Palettes

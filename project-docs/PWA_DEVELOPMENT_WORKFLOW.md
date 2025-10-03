@@ -51,9 +51,11 @@ npm run test:run -- src/test/unit/
 # Run in CI/CD pipeline, not locally
 npm run test:e2e
 npm run test:integration
+npm run test:behavioral
+npm run test:mcp:automated
 ```
 - **Purpose**: Full system validation
-- **Scope**: Cross-component interactions, real browser testing
+- **Scope**: Cross-component interactions, real browser testing, user workflow validation
 - **Action**: Block merges to main branch
 
 ### **Implementation Structure**
@@ -293,6 +295,156 @@ Our refactoring achieved:
 > **"This refactoring succeeded because we had 66 tests providing a safety net. Without them, we would have been flying blind through 3,741 lines of complex code. The tests didn't just verify our refactoring worked - they made the refactoring possible in the first place."**
 
 **Every future PWA project should budget 30-40% of refactoring time for comprehensive testing. It's not overhead - it's the foundation that makes safe architectural evolution possible.**
+
+---
+
+## 🎭 Advanced Testing Patterns
+
+### **Two-Track Testing Strategy**
+
+Modern PWA testing requires both **programmatic verification** and **natural language automation**. This dual approach provides comprehensive coverage while remaining maintainable.
+
+#### **Track 1: Functional/Behavioral Tests (JavaScript Libraries)**
+
+**Purpose:** Verify expected behaviors through direct input/output validation using JavaScript test frameworks.
+
+```javascript
+// Example: Behavioral test for settings persistence
+test('Settings: Theme change preserves difficulty (REGRESSION)', async () => {
+    // Setup
+    const settingsManager = new SettingsManager();
+    const difficultyManager = new DifficultyManager();
+    
+    // Set initial state
+    settingsManager.setTheme('wood');
+    difficultyManager.setDifficulty('hard');
+    
+    // Action: Change theme
+    settingsManager.setTheme('light');
+    
+    // Assert: Difficulty should be preserved
+    assertEqual(
+        difficultyManager.getCurrentDifficulty(), 
+        'hard', 
+        'Theme change should not reset difficulty'
+    );
+});
+```
+
+**Key Characteristics:**
+- ✅ **Fast execution** (< 5 seconds for full suite)
+- ✅ **Precise assertions** with exact expected values
+- ✅ **Regression prevention** for specific bugs that occurred before
+- ✅ **Component isolation** testing individual managers/modules
+- ✅ **High confidence** in core functionality
+
+**NPM Integration:**
+```json
+{
+  "scripts": {
+    "test:behavioral": "node tests/behavioral/run-tests.js",
+    "test:behavioral:browser": "echo 'Open http://localhost:3456/tests/behavioral/test-runner.html'",
+    "test:critical": "node scripts/pre-commit-tests.js"
+  }
+}
+```
+
+#### **Track 2: MCP Playwright Tests (Natural Language Automation)**
+
+**Purpose:** Direct Playwright via MCP to run comprehensive user workflow tests through natural language commands.
+
+```javascript
+// Example: MCP Playwright command generation
+getMCPCommands() {
+    return [
+        {
+            name: 'Navigate to Settings',
+            command: 'mcp_playwright_browser_navigate',
+            params: { url: 'http://localhost:3456/settings.html' }
+        },
+        {
+            name: 'Click Light Theme Button',
+            command: 'mcp_playwright_browser_click',
+            params: { 
+                element: 'Light theme button',
+                ref: '#theme-light'
+            }
+        },
+        {
+            name: 'Verify Theme Applied',
+            command: 'mcp_playwright_browser_evaluate',
+            params: {
+                function: '() => document.body.classList.contains("theme-light")',
+                element: 'Body element theme verification'
+            }
+        }
+    ];
+}
+```
+
+**Key Characteristics:**
+- ✅ **Real browser testing** with actual user interactions
+- ✅ **Cross-page workflows** testing navigation and state sync
+- ✅ **Visual verification** of themes, layouts, and UI states
+- ✅ **Touch/click simulation** for mobile interaction patterns
+- ✅ **Natural language commands** making tests readable and maintainable
+
+**NPM Integration:**
+```json
+{
+  "scripts": {
+    "test:e2e": "node tests/playwright/run-e2e-tests.js",
+    "test:e2e:auto": "node tests/playwright/run-mcp-automated.js",
+    "test:e2e:execute": "node tests/playwright/auto-execute-mcp.js",
+    "test:mcp:commands": "node tests/playwright/execute-mcp-tests.js",
+    "test:mcp:generate": "node tests/playwright/generate-mcp-test.js"
+  }
+}
+```
+
+### **Recommended Testing Architecture**
+
+```
+tests/
+├── behavioral/              # Track 1: Fast JS tests
+│   ├── run-tests.js         # CLI runner
+│   ├── test-runner.html     # Browser runner
+│   ├── app-tests.js         # Core functionality tests
+│   └── README.md            # Test documentation
+├── playwright/              # Track 2: MCP Playwright
+│   ├── auto-execute-mcp.js  # Automated execution
+│   ├── run-mcp-automated.js # Simulated automation
+│   ├── execute-mcp-tests.js # Command generation
+│   ├── mcp-playwright-instructions.md
+│   └── README.md
+├── unit/                    # Traditional unit tests
+├── integration/             # Cross-component tests
+└── characterization/        # Refactoring safety nets
+```
+
+### **When to Use Each Track**
+
+#### **Use Behavioral Tests (Track 1) For:**
+- 🎯 **Regression prevention** - Bugs that have occurred before
+- ⚡ **Fast feedback loops** - Pre-commit hooks and CI/CD
+- 🔧 **Component isolation** - Testing individual managers/modules
+- 📊 **Data validation** - Settings persistence, state management
+- 🎮 **Game mechanics** - Scoring, block placement, line clearing
+
+#### **Use MCP Playwright Tests (Track 2) For:**
+- 🌐 **Cross-page workflows** - Navigation, theme sync, settings flow
+- 📱 **Mobile interaction patterns** - Touch events, responsive layouts
+- 🎨 **Visual verification** - Theme application, UI state changes
+- 🔄 **User journey testing** - Complete workflows from start to finish
+- 🚀 **PWA functionality** - Installation, offline behavior, service workers
+
+### **Integration Best Practices**
+
+1. **Parallel Execution**: Run both tracks simultaneously in CI/CD
+2. **Fail Fast**: Behavioral tests run first (faster feedback)
+3. **Comprehensive Coverage**: Behavioral tests for logic, MCP for UX
+4. **Shared Test Data**: Use common fixtures and scenarios
+5. **Clear Reporting**: Separate results for each track with detailed metrics
 
 ### **Real-World Refactoring Success Story**
 
