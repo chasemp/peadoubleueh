@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import { resolve, dirname } from 'path'
-import { copyFileSync } from 'fs'
+import { copyFileSync, cpSync } from 'fs'
 import { fileURLToPath } from 'url'
 
 // ES modules don't have __dirname, so we create it
@@ -49,6 +49,23 @@ function copyServiceWorker() {
   }
 }
 
+// Plugin to copy project documentation to output
+function copyProjectDocs() {
+  return {
+    name: 'copy-project-docs',
+    closeBundle: async () => {
+      const docsSource = resolve(__dirname, 'project-docs')
+      const docsDest = resolve(__dirname, 'docs/project-docs')
+      try {
+        cpSync(docsSource, docsDest, { recursive: true })
+        console.log('✅ Project documentation copied to output directory')
+      } catch (error) {
+        console.error('❌ Failed to copy project docs:', error)
+      }
+    }
+  }
+}
+
 export default defineConfig({
   // Serve app files from `src/` during development
   root: 'src',
@@ -70,7 +87,8 @@ export default defineConfig({
     }
   },
   plugins: [
-    copyServiceWorker()
+    copyServiceWorker(),
+    copyProjectDocs()
   ],
   server: {
     port: 3000,
