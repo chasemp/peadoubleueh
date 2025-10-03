@@ -323,6 +323,71 @@ addTouchSupport(button, () => {
 
 ---
 
+## 🔌 Multi-PWA Port Management
+
+**Problem:** Running multiple PWAs locally causes port conflicts. Dev servers crash and you waste time troubleshooting.
+
+**Solution:** Assign each PWA a unique port and use management tools.
+
+### Port Registry Pattern
+
+```javascript
+// Assign unique ports (see PORT_REGISTRY.md)
+3456 - pwa-template
+3001 - blockdoku
+3002 - cannonpop
+3003 - bustagroove
+3004 - mealplanner
+```
+
+### Vite Configuration
+
+```javascript
+// vite.config.js
+export default defineConfig({
+  server: {
+    port: 3456,        // ← Unique for THIS project (see PORT_REGISTRY.md)
+    host: '0.0.0.0',
+    strictPort: true   // ← Fail fast if port is taken
+  }
+})
+```
+
+### Quick Commands
+
+```bash
+# Check your project's port
+npm run port               # → "This project runs on port 3456"
+
+# Check if port is free
+npm run port:check         # → Port status
+
+# Kill your project's port
+npm run port:kill          # → Frees port 3456
+
+# Force restart (kill + start)
+npm run port:force         # → Kill and restart
+
+# Check all PWA ports
+npm run ports              # → Status of all registered ports
+
+# Kill specific port
+npm run ports:kill 3001    # → Kills port 3001
+```
+
+### Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| Port already in use | `npm run port:kill` or `npm run port:force` |
+| Can't remember port | `npm run port` |
+| Check what's running | `npm run ports` |
+| Kill wrong port | `npm run ports:kill <port>` |
+
+**📚 Complete Guide:** [Multi-PWA Port Management](/project-docs/MULTI_PWA_PORT_MANAGEMENT.md) - Full setup, scripts, and best practices.
+
+---
+
 ## 🚀 Deployment Quick Reference
 
 ### The /src → /docs Pattern (MANDATORY)
