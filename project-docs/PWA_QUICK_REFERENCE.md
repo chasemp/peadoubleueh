@@ -360,6 +360,56 @@ colors: {
 
 ---
 
+### Service Worker & Build Tools Pitfall
+
+#### ❌ Caching source paths instead of built assets
+```javascript
+// BAD: Caching source paths that don't exist after build
+const STATIC_ASSETS = [
+  '/js/PWAApp.js',        // Doesn't exist after Vite build
+  '/css/styles.css',      // Actual file is /assets/main-abc123.css
+  '/manifest.json'
+];
+```
+
+**Problem:** Build tools like Vite add content hashes to filenames. The service worker tries to cache files that don't exist, causing install failure and leaving it in an invalid state.
+
+**Solution:** Only cache non-hashed files in STATIC_ASSETS
+```javascript
+// GOOD: Only cache files without content hashes
+const STATIC_ASSETS = [
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/build-info.json',
+  '/assets/icon-192x192.png',  // Icons don't have hashes
+  '/assets/icon-512x512.png'
+];
+
+// Hashed JS/CSS are cached dynamically via fetch event
+self.addEventListener('fetch', (event) => {
+  // Network-first for HTML, cache-first for assets
+  // This handles hashed filenames automatically
+});
+```
+
+**Error Recovery:**
+```javascript
+// Add recovery for InvalidStateError
+try {
+  await registration.update();
+} catch (error) {
+  if (error.name === 'InvalidStateError') {
+    // Unregister and re-register
+    await navigator.serviceWorker.getRegistrations()
+      .then(regs => Promise.all(regs.map(r => r.unregister())));
+    await navigator.serviceWorker.register('/sw.js');
+  }
+}
+```
+
+---
+
 ### Common Theming Mistakes
 
 #### ❌ Forgetting to rebuild CSS after config changes
