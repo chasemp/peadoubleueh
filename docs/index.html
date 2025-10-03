@@ -3,24 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pea's with Answers - PWA Best Practices</title>
+  <title>PWA Template - Best Practices</title>
   
   <!-- PWA Manifest -->
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="./assets/manifest-CCJ0SpxS.json">
   
   <!-- Theme Color for Mobile -->
   <meta name="theme-color" content="#2196F3">
   
   <!-- Apple Touch Icon -->
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="apple-touch-icon" href="assets/icon-192x192.png">
   
   <!-- Favicon -->
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16x16.png">
-  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
   
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/styles.css?v=edf867ff?v=edf867ff?v=edf867ff">
   
   <!-- Critical CSS Inline for Performance -->
   <style>
@@ -30,6 +28,7 @@
     .main { padding: 1rem; }
     .loading { text-align: center; padding: 2rem; }
   </style>
+  <link rel="stylesheet" crossorigin href="./assets/main-Bq9xhRSF.css">
 </head>
 <body>
   <!-- PWA Install Prompt (Hidden by default) -->
@@ -55,13 +54,7 @@
   <!-- Main App Structure -->
   <header class="header">
     <div class="header-content">
-      <div class="logo-section">
-        <img src="assets/logo.png" alt="Pea's with Answers" class="logo" width="40" height="40">
-        <div class="brand">
-          <h1>Pea's with Answers</h1>
-          <p class="tagline">PWA Best Practices</p>
-        </div>
-      </div>
+      <h1>PWA Template</h1>
       <div class="header-actions">
         <button id="theme-toggle" class="btn btn-icon" aria-label="Toggle theme">🌙</button>
         <button id="settings-btn" class="btn btn-icon" aria-label="Settings">⚙️</button>
@@ -79,9 +72,8 @@
     <!-- Main Content -->
     <div id="content" class="content" style="display: none;">
       <section class="hero">
-        <h2>Welcome to Pea's with Answers</h2>
-        <p>Your go-to resource for PWA best practices, learned from building multiple Progressive Web Apps.</p>
-        <p class="subtitle">🌱 Growing better PWAs, one lesson at a time</p>
+        <h2>Welcome to PWA Template</h2>
+        <p>This template includes all the best practices we've learned from building multiple PWAs.</p>
       </section>
 
       <section class="features">
@@ -152,6 +144,6 @@
   <script src="js/utils/PerformanceMonitor.js"></script>
   <script src="js/strategies/CacheBustingManager.js"></script>
   <script src="js/service-workers/ServiceWorkerManager.js"></script>
-  <script src="js/PWAApp.js?v=e8a7bc6e?v=e8a7bc6e?v=e8a7bc6e"></script>
+  <script src="js/PWAApp.js"></script>
 </body>
 </html>

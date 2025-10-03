@@ -10,7 +10,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const hookPath = resolve(__dirname, '../.git/hooks/pre-commit');
+const hookPath = resolve(__dirname, '../../../.git/hooks/pre-commit');
 const hooksDir = dirname(hookPath);
 
 // Ensure hooks directory exists

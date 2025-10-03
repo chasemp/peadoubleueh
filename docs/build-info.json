@@ -1,8 +1,6 @@
 {
-  "version": "1.0.0",
-  "buildTime": "2025-09-30T19:50:17.122Z",
-  "commit": "local",
-  "branch": "local",
-  "cssHash": "edf867ff",
-  "jsHash": "e8a7bc6e"
+  "version": "build-1759502968862",
+  "timestamp": "2025-10-03T14:49:28.862Z",
+  "node_version": "v24.5.0",
+  "platform": "darwin"
 }

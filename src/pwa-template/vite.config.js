@@ -32,8 +32,9 @@ export default defineConfig({
   // Use relative base to support GitHub Pages deployment
   base: './',
   build: {
-    // Output into /docs directory for GitHub Pages deployment
-    outDir: '../docs',
+    // Output into /docs directory at repository root for GitHub Pages deployment
+    // Note: Relative to 'root' (src/pwa-template/src/), so ../../../docs = repo root /docs
+    outDir: '../../../docs',
     // Safe to empty /docs since it only contains built files
     emptyOutDir: true,
     assetsDir: 'assets',
