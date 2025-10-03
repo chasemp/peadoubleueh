@@ -23,20 +23,17 @@ const STATIC_CACHE_NAME = `pwa-template-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE_NAME = `pwa-template-dynamic-${CACHE_VERSION}`;
 
 // Static assets to cache immediately
+// NOTE: Only cache files that exist after build (no hashed filenames)
+// JS/CSS assets with content hashes are cached dynamically via fetch event
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/css/styles.css',
-  '/js/PWAApp.js',
-  '/js/utils/StorageManager.js',
-  '/js/utils/ThemeManager.js',
-  '/js/utils/NotificationManager.js',
-  '/js/utils/PerformanceMonitor.js',
-  '/js/strategies/CacheBustingManager.js',
-  '/js/service-workers/ServiceWorkerManager.js',
   '/manifest.json',
+  '/build-info.json',
   '/assets/icon-192x192.png',
-  '/assets/icon-512x512.png'
+  '/assets/icon-512x512.png',
+  '/assets/maskable-icon-192x192.png',
+  '/assets/maskable-icon-512x512.png'
 ];
 
 // Install Event - Cache static assets
@@ -45,17 +42,30 @@ self.addEventListener('install', (event) => {
   
   event.waitUntil(
     caches.open(STATIC_CACHE_NAME)
-      .then(cache => {
+      .then(async (cache) => {
         logger.log('📦 Caching static assets...');
-        return cache.addAll(STATIC_ASSETS);
-      })
-      .then(() => {
-        logger.log('✅ Static assets cached successfully');
+        
+        // Cache assets individually to handle failures gracefully
+        const cachePromises = STATIC_ASSETS.map(async (url) => {
+          try {
+            await cache.add(url);
+            logger.log(`✅ Cached: ${url}`);
+          } catch (error) {
+            logger.warn(`⚠️ Failed to cache ${url}:`, error.message);
+            // Continue anyway - don't let one failure block the install
+          }
+        });
+        
+        await Promise.all(cachePromises);
+        logger.log('✅ Service Worker install complete');
+        
         // Force immediate activation
         return self.skipWaiting();
       })
       .catch(error => {
-        logger.error('❌ Failed to cache static assets:', error);
+        logger.error('❌ Failed to open cache:', error);
+        // Still skip waiting to avoid blocking
+        return self.skipWaiting();
       })
   );
 });
