@@ -3,6 +3,8 @@
  * Based on lessons learned from multiple PWA projects
  */
 
+import logger from './Logger.js';
+
 class ThemeManager {
   constructor() {
     this.storageKey = 'pwa_template_theme';
@@ -20,7 +22,7 @@ class ThemeManager {
   async initialize() {
     if (this.isInitialized) return;
     
-    console.log('🎨 Initializing Theme Manager...');
+    logger.log('🎨 Initializing Theme Manager...');
     
     try {
       // Load saved theme preference
@@ -33,9 +35,9 @@ class ThemeManager {
       this.setupSystemThemeListener();
       
       this.isInitialized = true;
-      console.log('✅ Theme Manager initialized successfully');
+      logger.log('✅ Theme Manager initialized successfully');
     } catch (error) {
-      console.error('❌ Failed to initialize Theme Manager:', error);
+      logger.error('❌ Failed to initialize Theme Manager:', error);
       throw error;
     }
   }
@@ -71,7 +73,7 @@ class ThemeManager {
         this.currentTheme = savedTheme;
       }
     } catch (error) {
-      console.error('Failed to load theme preference:', error);
+      logger.error('Failed to load theme preference:', error);
     }
   }
 
@@ -79,13 +81,13 @@ class ThemeManager {
     try {
       localStorage.setItem(this.storageKey, theme);
     } catch (error) {
-      console.error('Failed to save theme preference:', error);
+      logger.error('Failed to save theme preference:', error);
     }
   }
 
   setTheme(theme) {
     if (!this.themes.includes(theme)) {
-      console.warn(`Invalid theme: ${theme}. Must be one of: ${this.themes.join(', ')}`);
+      logger.warn(`Invalid theme: ${theme}. Must be one of: ${this.themes.join(', ')}`);
       return false;
     }
     
@@ -130,7 +132,7 @@ class ThemeManager {
     // Update meta theme-color
     this.updateMetaThemeColor(effectiveTheme);
     
-    console.log(`🎨 Applied theme: ${this.currentTheme} (effective: ${effectiveTheme})`);
+    logger.log(`🎨 Applied theme: ${this.currentTheme} (effective: ${effectiveTheme})`);
   }
 
   updateMetaThemeColor(theme) {
@@ -168,7 +170,7 @@ class ThemeManager {
           systemTheme: this.systemTheme
         });
       } catch (error) {
-        console.error('Error in theme change callback:', error);
+        logger.error('Error in theme change callback:', error);
       }
     });
   }

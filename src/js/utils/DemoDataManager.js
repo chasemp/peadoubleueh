@@ -6,6 +6,8 @@
  * not separate scripts that will diverge and create their own bugs.
  */
 
+import logger from './Logger.js';
+
 class DemoDataManager {
   constructor(platformAPI, storageManager) {
     this.platformAPI = platformAPI;
@@ -21,14 +23,14 @@ class DemoDataManager {
    */
   async loadDemoData() {
     try {
-      console.log('📊 Loading demo data from platform...');
+      logger.log('📊 Loading demo data from platform...');
       
       // Check if we have recent demo data
       const lastRefresh = this.storageManager.getData(this.lastRefreshKey);
       const now = Date.now();
       
       if (lastRefresh && (now - lastRefresh) < this.refreshInterval) {
-        console.log('📊 Using cached demo data');
+        logger.log('📊 Using cached demo data');
         return this.storageManager.getData(this.demoDataKey);
       }
       
@@ -39,16 +41,16 @@ class DemoDataManager {
       this.storageManager.setData(this.demoDataKey, demoData);
       this.storageManager.setData(this.lastRefreshKey, now);
       
-      console.log('✅ Demo data loaded successfully');
+      logger.log('✅ Demo data loaded successfully');
       return demoData;
       
     } catch (error) {
-      console.error('❌ Failed to load demo data:', error);
+      logger.error('❌ Failed to load demo data:', error);
       
       // Try to use cached data as fallback
       const cachedData = this.storageManager.getData(this.demoDataKey);
       if (cachedData) {
-        console.log('📊 Using cached demo data as fallback');
+        logger.log('📊 Using cached demo data as fallback');
         return cachedData;
       }
       
@@ -115,7 +117,7 @@ class DemoDataManager {
       }
     }
 
-    console.log('✅ Demo data validation passed');
+    logger.log('✅ Demo data validation passed');
   }
 
   /**
@@ -123,7 +125,7 @@ class DemoDataManager {
    * Forces a fresh fetch from platform
    */
   async refreshDemoData() {
-    console.log('🔄 Refreshing demo data from platform...');
+    logger.log('🔄 Refreshing demo data from platform...');
     
     // Clear cached data
     this.storageManager.removeData(this.lastRefreshKey);
@@ -200,7 +202,7 @@ class DemoDataManager {
   clearDemoData() {
     this.storageManager.removeData(this.demoDataKey);
     this.storageManager.removeData(this.lastRefreshKey);
-    console.log('🗑️ Demo data cleared');
+    logger.log('🗑️ Demo data cleared');
   }
 }
 

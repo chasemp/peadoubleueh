@@ -3,6 +3,20 @@
  * Based on lessons learned from multiple PWA projects
  */
 
+// Inline logger for service worker (no ES6 modules support)
+const isDev = () => {
+  return self.location.hostname === 'localhost' || 
+         self.location.hostname.includes('127.0.0.1') ||
+         self.registration?.scope.includes('localhost');
+};
+
+const logger = {
+  log: (...args) => { if (isDev()) logger.log(...args); },
+  warn: (...args) => { if (isDev()) logger.warn(...args); },
+  error: (...args) => { logger.error(...args); }, // Always log errors
+  info: (emoji, ...args) => { if (isDev()) logger.log(emoji, ...args); }
+};
+
 const CACHE_VERSION = '1.0.0';
 const CACHE_NAME = `pwa-template-cache-${CACHE_VERSION}`;
 const STATIC_CACHE_NAME = `pwa-template-static-${CACHE_VERSION}`;
@@ -27,28 +41,28 @@ const STATIC_ASSETS = [
 
 // Install Event - Cache static assets
 self.addEventListener('install', (event) => {
-  console.log('🔧 Service Worker installing...');
+  logger.log('🔧 Service Worker installing...');
   
   event.waitUntil(
     caches.open(STATIC_CACHE_NAME)
       .then(cache => {
-        console.log('📦 Caching static assets...');
+        logger.log('📦 Caching static assets...');
         return cache.addAll(STATIC_ASSETS);
       })
       .then(() => {
-        console.log('✅ Static assets cached successfully');
+        logger.log('✅ Static assets cached successfully');
         // Force immediate activation
         return self.skipWaiting();
       })
       .catch(error => {
-        console.error('❌ Failed to cache static assets:', error);
+        logger.error('❌ Failed to cache static assets:', error);
       })
   );
 });
 
 // Activate Event - Clean up old caches
 self.addEventListener('activate', (event) => {
-  console.log('🚀 Service Worker activating...');
+  logger.log('🚀 Service Worker activating...');
   
   event.waitUntil(
     caches.keys()
@@ -58,19 +72,19 @@ self.addEventListener('activate', (event) => {
             // Delete old caches that don't match current version
             if (cacheName.startsWith('pwa-template-') && 
                 !cacheName.includes(CACHE_VERSION)) {
-              console.log('🗑️ Deleting old cache:', cacheName);
+              logger.log('🗑️ Deleting old cache:', cacheName);
               return caches.delete(cacheName);
             }
           })
         );
       })
       .then(() => {
-        console.log('✅ Service Worker activated successfully');
+        logger.log('✅ Service Worker activated successfully');
         // Take control of all clients immediately
         return self.clients.claim();
       })
       .catch(error => {
-        console.error('❌ Service Worker activation failed:', error);
+        logger.error('❌ Service Worker activation failed:', error);
       })
   );
 });
@@ -106,7 +120,7 @@ async function handleStaticAsset(request) {
     // Try cache first
     const cachedResponse = await caches.match(request);
     if (cachedResponse) {
-      console.log('📦 Serving from cache:', request.url);
+      logger.log('📦 Serving from cache:', request.url);
       return cachedResponse;
     }
     
@@ -121,7 +135,7 @@ async function handleStaticAsset(request) {
     
     return networkResponse;
   } catch (error) {
-    console.error('Failed to handle static asset:', request.url, error);
+    logger.error('Failed to handle static asset:', request.url, error);
     return new Response('Asset not available', { status: 404 });
   }
 }
@@ -140,7 +154,7 @@ async function handleAPIRequest(request) {
     
     return networkResponse;
   } catch (error) {
-    console.log('🌐 Network failed, trying cache for API:', request.url);
+    logger.log('🌐 Network failed, trying cache for API:', request.url);
     
     // If network fails, try cache
     const cachedResponse = await caches.match(request);
@@ -179,7 +193,7 @@ async function handleDynamicRequest(request) {
     
     // Return cached response immediately if available
     if (cachedResponse) {
-      console.log('📦 Serving from cache (stale):', request.url);
+      logger.log('📦 Serving from cache (stale):', request.url);
       return cachedResponse;
     }
     
@@ -195,7 +209,7 @@ async function handleDynamicRequest(request) {
       headers: { 'Content-Type': 'text/html' }
     });
   } catch (error) {
-    console.error('Failed to handle dynamic request:', request.url, error);
+    logger.error('Failed to handle dynamic request:', request.url, error);
     return new Response('Request failed', { status: 500 });
   }
 }
@@ -235,7 +249,7 @@ self.addEventListener('message', (event) => {
       break;
       
     default:
-      console.log('Unknown message action:', action);
+      logger.log('Unknown message action:', action);
   }
 });
 
@@ -258,7 +272,7 @@ async function handleCacheBust(data) {
         break;
         
       default:
-        console.log('Unknown cache bust strategy:', strategy);
+        logger.log('Unknown cache bust strategy:', strategy);
     }
     
     // Notify clients of cache update
@@ -270,7 +284,7 @@ async function handleCacheBust(data) {
       });
     });
   } catch (error) {
-    console.error('Cache bust failed:', error);
+    logger.error('Cache bust failed:', error);
   }
 }
 
@@ -292,7 +306,7 @@ async function handleVersionBump() {
     )
   );
   
-  console.log('Cache version bumped to:', newVersion);
+  logger.log('Cache version bumped to:', newVersion);
 }
 
 async function handleSignatureInvalidation(resources) {
@@ -301,7 +315,7 @@ async function handleSignatureInvalidation(resources) {
   
   for (const resource of resources) {
     await cache.delete(resource);
-    console.log('Invalidated resource:', resource);
+    logger.log('Invalidated resource:', resource);
   }
 }
 
@@ -316,7 +330,7 @@ async function handleSelectiveClear(resources) {
     }
   }
   
-  console.log('Selectively cleared resources:', resources);
+  logger.log('Selectively cleared resources:', resources);
 }
 
 async function clearAllCaches() {
@@ -324,7 +338,7 @@ async function clearAllCaches() {
   await Promise.all(
     cacheNames.map(cacheName => caches.delete(cacheName))
   );
-  console.log('All caches cleared');
+  logger.log('All caches cleared');
 }
 
 async function getCacheStatus() {
@@ -351,7 +365,7 @@ function incrementVersion(version) {
 
 // Background sync for offline actions
 self.addEventListener('sync', (event) => {
-  console.log('🔄 Background sync triggered:', event.tag);
+  logger.log('🔄 Background sync triggered:', event.tag);
   
   if (event.tag === 'background-sync') {
     event.waitUntil(doBackgroundSync());
@@ -361,7 +375,7 @@ self.addEventListener('sync', (event) => {
 async function doBackgroundSync() {
   try {
     // Perform background sync operations
-    console.log('Performing background sync...');
+    logger.log('Performing background sync...');
     
     // Example: Sync offline data
     const offlineData = await getOfflineData();
@@ -369,9 +383,9 @@ async function doBackgroundSync() {
       await syncOfflineData(offlineData);
     }
     
-    console.log('Background sync completed');
+    logger.log('Background sync completed');
   } catch (error) {
-    console.error('Background sync failed:', error);
+    logger.error('Background sync failed:', error);
   }
 }
 
@@ -382,12 +396,12 @@ async function getOfflineData() {
 
 async function syncOfflineData(data) {
   // Sync offline data with server
-  console.log('Syncing offline data:', data);
+  logger.log('Syncing offline data:', data);
 }
 
 // Push notification handling
 self.addEventListener('push', (event) => {
-  console.log('📱 Push notification received');
+  logger.log('📱 Push notification received');
   
   const options = {
     body: event.data ? event.data.text() : 'New notification',
@@ -419,7 +433,7 @@ self.addEventListener('push', (event) => {
 
 // Notification click handling
 self.addEventListener('notificationclick', (event) => {
-  console.log('🔔 Notification clicked:', event.action);
+  logger.log('🔔 Notification clicked:', event.action);
   
   event.notification.close();
   
@@ -430,4 +444,4 @@ self.addEventListener('notificationclick', (event) => {
   }
 });
 
-console.log('🔧 Service Worker script loaded');
+logger.log('🔧 Service Worker script loaded');

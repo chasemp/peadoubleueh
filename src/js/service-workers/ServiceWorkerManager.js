@@ -3,6 +3,8 @@
  * Based on lessons learned from multiple PWA projects
  */
 
+import logger from '../utils/Logger.js';
+
 class ServiceWorkerManager {
   constructor() {
     this.registration = null;
@@ -15,7 +17,7 @@ class ServiceWorkerManager {
   async initialize() {
     if (this.isInitialized || !this.isSupported) return;
     
-    console.log('🔧 Initializing Service Worker Manager...');
+    logger.log('🔧 Initializing Service Worker Manager...');
     
     try {
       // Register service worker
@@ -25,16 +27,16 @@ class ServiceWorkerManager {
       this.setupEventListeners();
       
       this.isInitialized = true;
-      console.log('✅ Service Worker Manager initialized successfully');
+      logger.log('✅ Service Worker Manager initialized successfully');
     } catch (error) {
-      console.error('❌ Failed to initialize Service Worker Manager:', error);
+      logger.error('❌ Failed to initialize Service Worker Manager:', error);
       throw error;
     }
   }
 
   async register() {
     if (!this.isSupported) {
-      console.warn('Service Worker not supported in this browser');
+      logger.warn('Service Worker not supported in this browser');
       return null;
     }
 
@@ -43,10 +45,10 @@ class ServiceWorkerManager {
         scope: '/'
       });
       
-      console.log('✅ Service Worker registered successfully');
+      logger.log('✅ Service Worker registered successfully');
       return this.registration;
     } catch (error) {
-      console.error('❌ Service Worker registration failed:', error);
+      logger.error('❌ Service Worker registration failed:', error);
       throw error;
     }
   }
@@ -56,7 +58,7 @@ class ServiceWorkerManager {
 
     // Listen for service worker updates
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-      console.log('🔄 Service Worker controller changed');
+      logger.log('🔄 Service Worker controller changed');
       this.handleControllerChange();
     });
 
@@ -68,7 +70,7 @@ class ServiceWorkerManager {
     // Listen for service worker state changes
     if (this.registration) {
       this.registration.addEventListener('updatefound', () => {
-        console.log('🔄 Service Worker update found');
+        logger.log('🔄 Service Worker update found');
         this.handleUpdateFound();
       });
     }
@@ -93,7 +95,7 @@ class ServiceWorkerManager {
         this.handleInstallReady(data);
         break;
       default:
-        console.log('Unknown service worker message:', action);
+        logger.log('Unknown service worker message:', action);
     }
   }
 
@@ -105,11 +107,11 @@ class ServiceWorkerManager {
         if (newWorker.state === 'installed') {
           if (navigator.serviceWorker.controller) {
             // New service worker is available
-            console.log('🔄 New service worker is available');
+            logger.log('🔄 New service worker is available');
             this.handleUpdateAvailable();
           } else {
             // Service worker is installed for the first time
-            console.log('✅ Service worker installed for the first time');
+            logger.log('✅ Service worker installed for the first time');
             this.handleInstallReady();
           }
         }
@@ -118,37 +120,37 @@ class ServiceWorkerManager {
   }
 
   handleCacheUpdated(data) {
-    console.log('📦 Cache updated:', data);
+    logger.log('📦 Cache updated:', data);
     
     this.updateCallbacks.forEach(callback => {
       try {
         callback({ type: 'cache-updated', data });
       } catch (error) {
-        console.error('Error in update callback:', error);
+        logger.error('Error in update callback:', error);
       }
     });
   }
 
   handleUpdateAvailable(data) {
-    console.log('🔄 Update available:', data);
+    logger.log('🔄 Update available:', data);
     
     this.updateCallbacks.forEach(callback => {
       try {
         callback({ type: 'update-available', data });
       } catch (error) {
-        console.error('Error in update callback:', error);
+        logger.error('Error in update callback:', error);
       }
     });
   }
 
   handleInstallReady(data) {
-    console.log('✅ Install ready:', data);
+    logger.log('✅ Install ready:', data);
     
     this.installCallbacks.forEach(callback => {
       try {
         callback({ type: 'install-ready', data });
       } catch (error) {
-        console.error('Error in install callback:', error);
+        logger.error('Error in install callback:', error);
       }
     });
   }
@@ -156,33 +158,33 @@ class ServiceWorkerManager {
   // Public API
   async checkForUpdates() {
     if (!this.registration) {
-      console.warn('No service worker registration found');
+      logger.warn('No service worker registration found');
       return false;
     }
 
     try {
       await this.registration.update();
-      console.log('✅ Update check completed');
+      logger.log('✅ Update check completed');
       return true;
     } catch (error) {
-      console.error('❌ Update check failed:', error);
+      logger.error('❌ Update check failed:', error);
       return false;
     }
   }
 
   async updateApp() {
     if (!this.registration || !this.registration.waiting) {
-      console.warn('No waiting service worker found');
+      logger.warn('No waiting service worker found');
       return false;
     }
 
     try {
       // Tell the waiting service worker to skip waiting and become active
       this.registration.waiting.postMessage({ action: 'SKIP_WAITING' });
-      console.log('✅ App update initiated');
+      logger.log('✅ App update initiated');
       return true;
     } catch (error) {
-      console.error('❌ App update failed:', error);
+      logger.error('❌ App update failed:', error);
       return false;
     }
   }
@@ -190,13 +192,13 @@ class ServiceWorkerManager {
   async installApp() {
     // This would typically be handled by the browser's install prompt
     // For now, we'll just log it
-    console.log('📱 App install requested');
+    logger.log('📱 App install requested');
     
     this.installCallbacks.forEach(callback => {
       try {
         callback({ type: 'install-requested' });
       } catch (error) {
-        console.error('Error in install callback:', error);
+        logger.error('Error in install callback:', error);
       }
     });
     
@@ -205,7 +207,7 @@ class ServiceWorkerManager {
 
   async clearCaches() {
     if (!('caches' in window)) {
-      console.warn('Cache API not supported');
+      logger.warn('Cache API not supported');
       return false;
     }
 
@@ -214,26 +216,26 @@ class ServiceWorkerManager {
       await Promise.all(
         cacheNames.map(cacheName => caches.delete(cacheName))
       );
-      console.log('✅ All caches cleared');
+      logger.log('✅ All caches cleared');
       return true;
     } catch (error) {
-      console.error('❌ Failed to clear caches:', error);
+      logger.error('❌ Failed to clear caches:', error);
       return false;
     }
   }
 
   async clearSpecificCache(cacheName) {
     if (!('caches' in window)) {
-      console.warn('Cache API not supported');
+      logger.warn('Cache API not supported');
       return false;
     }
 
     try {
       await caches.delete(cacheName);
-      console.log(`✅ Cache cleared: ${cacheName}`);
+      logger.log(`✅ Cache cleared: ${cacheName}`);
       return true;
     } catch (error) {
-      console.error(`❌ Failed to clear cache ${cacheName}:`, error);
+      logger.error(`❌ Failed to clear cache ${cacheName}:`, error);
       return false;
     }
   }
@@ -258,7 +260,7 @@ class ServiceWorkerManager {
       
       return status;
     } catch (error) {
-      console.error('Failed to get cache status:', error);
+      logger.error('Failed to get cache status:', error);
       return { error: error.message };
     }
   }
@@ -275,7 +277,7 @@ class ServiceWorkerManager {
   // Cache Busting
   async bustCache(strategy, resources = []) {
     if (!this.registration || !this.registration.active) {
-      console.warn('No active service worker found');
+      logger.warn('No active service worker found');
       return false;
     }
 
@@ -284,10 +286,10 @@ class ServiceWorkerManager {
         action: 'CACHE_BUST',
         data: { strategy, resources }
       });
-      console.log(`✅ Cache bust initiated: ${strategy}`);
+      logger.log(`✅ Cache bust initiated: ${strategy}`);
       return true;
     } catch (error) {
-      console.error('❌ Cache bust failed:', error);
+      logger.error('❌ Cache bust failed:', error);
       return false;
     }
   }
@@ -330,17 +332,17 @@ class ServiceWorkerManager {
   // Utility Methods
   async unregister() {
     if (!this.registration) {
-      console.warn('No service worker registration to unregister');
+      logger.warn('No service worker registration to unregister');
       return false;
     }
 
     try {
       const result = await this.registration.unregister();
-      console.log('✅ Service worker unregistered');
+      logger.log('✅ Service worker unregistered');
       this.registration = null;
       return result;
     } catch (error) {
-      console.error('❌ Failed to unregister service worker:', error);
+      logger.error('❌ Failed to unregister service worker:', error);
       return false;
     }
   }
@@ -353,7 +355,7 @@ class ServiceWorkerManager {
     try {
       return await navigator.serviceWorker.getRegistrations();
     } catch (error) {
-      console.error('Failed to get service worker registrations:', error);
+      logger.error('Failed to get service worker registrations:', error);
       return [];
     }
   }
@@ -361,7 +363,7 @@ class ServiceWorkerManager {
   // Force Update
   async forceUpdate() {
     if (!this.registration) {
-      console.warn('No service worker registration found');
+      logger.warn('No service worker registration found');
       return false;
     }
 
@@ -377,10 +379,10 @@ class ServiceWorkerManager {
         this.registration.waiting.postMessage({ action: 'SKIP_WAITING' });
       }
       
-      console.log('✅ Force update completed');
+      logger.log('✅ Force update completed');
       return true;
     } catch (error) {
-      console.error('❌ Force update failed:', error);
+      logger.error('❌ Force update failed:', error);
       return false;
     }
   }

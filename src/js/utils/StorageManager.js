@@ -3,6 +3,8 @@
  * Based on lessons learned from multiple PWA projects
  */
 
+import logger from './Logger.js';
+
 class StorageManager {
   constructor() {
     this.storageKey = 'pwa_template_data';
@@ -24,7 +26,7 @@ class StorageManager {
   async initialize() {
     if (this.isInitialized) return;
     
-    console.log('🗄️ Initializing Storage Manager...');
+    logger.log('🗄️ Initializing Storage Manager...');
     
     try {
       // Check for data migration
@@ -36,9 +38,9 @@ class StorageManager {
       }
       
       this.isInitialized = true;
-      console.log('✅ Storage Manager initialized successfully');
+      logger.log('✅ Storage Manager initialized successfully');
     } catch (error) {
-      console.error('❌ Failed to initialize Storage Manager:', error);
+      logger.error('❌ Failed to initialize Storage Manager:', error);
       throw error;
     }
   }
@@ -49,7 +51,7 @@ class StorageManager {
       const settings = localStorage.getItem(this.settingsKey);
       return settings ? JSON.parse(settings) : null;
     } catch (error) {
-      console.error('Failed to get settings:', error);
+      logger.error('Failed to get settings:', error);
       return null;
     }
   }
@@ -61,7 +63,7 @@ class StorageManager {
       localStorage.setItem(this.settingsKey, JSON.stringify(mergedSettings));
       return true;
     } catch (error) {
-      console.error('Failed to set settings:', error);
+      logger.error('Failed to set settings:', error);
       return false;
     }
   }
@@ -77,7 +79,7 @@ class StorageManager {
       const item = localStorage.getItem(key);
       return item ? JSON.parse(item) : defaultValue;
     } catch (error) {
-      console.error(`Failed to get item ${key}:`, error);
+      logger.error(`Failed to get item ${key}:`, error);
       return defaultValue;
     }
   }
@@ -87,7 +89,7 @@ class StorageManager {
       localStorage.setItem(key, JSON.stringify(value));
       return true;
     } catch (error) {
-      console.error(`Failed to set item ${key}:`, error);
+      logger.error(`Failed to set item ${key}:`, error);
       return false;
     }
   }
@@ -97,7 +99,7 @@ class StorageManager {
       localStorage.removeItem(key);
       return true;
     } catch (error) {
-      console.error(`Failed to remove item ${key}:`, error);
+      logger.error(`Failed to remove item ${key}:`, error);
       return false;
     }
   }
@@ -131,7 +133,7 @@ class StorageManager {
     }
     
     if (storedVersion !== this.currentVersion) {
-      console.log(`🔄 Migrating data from version ${storedVersion} to ${this.currentVersion}`);
+      logger.log(`🔄 Migrating data from version ${storedVersion} to ${this.currentVersion}`);
       await this.migrateData(storedVersion, this.currentVersion);
       localStorage.setItem(this.versionKey, this.currentVersion);
     }
@@ -151,14 +153,14 @@ class StorageManager {
       for (const version of versionNumbers) {
         const migration = migrations[version];
         if (migration) {
-          console.log(`Running migration for version ${version}`);
+          logger.log(`Running migration for version ${version}`);
           await migration();
         }
       }
       
-      console.log('✅ Data migration completed successfully');
+      logger.log('✅ Data migration completed successfully');
     } catch (error) {
-      console.error('❌ Data migration failed:', error);
+      logger.error('❌ Data migration failed:', error);
       // Don't throw - allow app to continue with potentially incomplete data
     }
   }
@@ -170,7 +172,7 @@ class StorageManager {
     const toIndex = versions.indexOf(toVersion);
     
     if (fromIndex === -1 || toIndex === -1) {
-      console.warn('Unknown version in migration');
+      logger.warn('Unknown version in migration');
       return [];
     }
     
@@ -179,7 +181,7 @@ class StorageManager {
 
   migrateToV1_0_0() {
     // Example migration logic
-    console.log('Running migration to v1.0.0');
+    logger.log('Running migration to v1.0.0');
     
     // Migrate old settings format if needed
     const oldSettings = localStorage.getItem('old_settings_key');
@@ -195,7 +197,7 @@ class StorageManager {
         this.setSettings(newSettings);
         localStorage.removeItem('old_settings_key');
       } catch (error) {
-        console.error('Failed to migrate old settings:', error);
+        logger.error('Failed to migrate old settings:', error);
       }
     }
   }
@@ -211,7 +213,7 @@ class StorageManager {
       }
       return totalSize;
     } catch (error) {
-      console.error('Failed to calculate storage usage:', error);
+      logger.error('Failed to calculate storage usage:', error);
       return 0;
     }
   }
@@ -224,7 +226,7 @@ class StorageManager {
       }
       return null;
     } catch (error) {
-      console.error('Failed to get storage quota:', error);
+      logger.error('Failed to get storage quota:', error);
       return null;
     }
   }
@@ -244,9 +246,9 @@ class StorageManager {
       }
       
       this.setData(cleanedData);
-      console.log('✅ Old data cleaned up');
+      logger.log('✅ Old data cleaned up');
     } catch (error) {
-      console.error('Failed to cleanup old data:', error);
+      logger.error('Failed to cleanup old data:', error);
     }
   }
 
@@ -273,7 +275,7 @@ class StorageManager {
       
       return true;
     } catch (error) {
-      console.error('Failed to export data:', error);
+      logger.error('Failed to export data:', error);
       return false;
     }
   }
@@ -298,10 +300,10 @@ class StorageManager {
         this.setData(importedData.data);
       }
       
-      console.log('✅ Data imported successfully');
+      logger.log('✅ Data imported successfully');
       return true;
     } catch (error) {
-      console.error('Failed to import data:', error);
+      logger.error('Failed to import data:', error);
       return false;
     }
   }
@@ -318,10 +320,10 @@ class StorageManager {
   clearAll() {
     try {
       localStorage.clear();
-      console.log('✅ All storage cleared');
+      logger.log('✅ All storage cleared');
       return true;
     } catch (error) {
-      console.error('Failed to clear all storage:', error);
+      logger.error('Failed to clear all storage:', error);
       return false;
     }
   }

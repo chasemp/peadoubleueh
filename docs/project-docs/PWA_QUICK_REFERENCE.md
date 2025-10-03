@@ -75,6 +75,9 @@ window.addEventListener('storage', (e) => {
 ```
 
 ### Modal Cleanup (Prevent Touch Blocking)
+
+> **💡 Best Practice:** For settings and most UI flows, prefer **page-based navigation** over modals. See [PWA_MOBILE_UX_GUIDE.md](./PWA_MOBILE_UX_GUIDE.md#navigation-patterns) for page-based patterns. Use modals sparingly for critical interruptions only.
+
 ```javascript
 // ✅ Properly remove from DOM, not just hide
 hide() {
