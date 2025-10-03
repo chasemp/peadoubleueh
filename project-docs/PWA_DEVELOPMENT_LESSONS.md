@@ -45,7 +45,8 @@ Learn: Modular architecture, service workers, state management, refactoring patt
 
 ### **I'm managing multiple PWAs locally**
 → Start with **[Multi-PWA Port Management](/project-docs/MULTI_PWA_PORT_MANAGEMENT.md)**  
-Learn: Port assignment strategy, conflict prevention, management scripts, best practices
+Learn: Port assignment strategy, conflict prevention, management scripts, best practices  
+→ See also **[Port Registry](/project-docs/PORT_REGISTRY.md)** for current port assignments
 
 ### **I need external resources, tools, or examples**
 → Start with **[PWA Resources & References](/project-docs/PWA_RESOURCES.md)**  
