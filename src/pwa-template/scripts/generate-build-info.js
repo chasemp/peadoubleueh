@@ -11,7 +11,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const docsDir = resolve(__dirname, '../docs');
+const docsDir = resolve(__dirname, '../../../docs');
 const buildDate = new Date().toISOString();
 const buildVersion = `build-${Date.now()}`;
 
