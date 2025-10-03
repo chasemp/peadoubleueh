@@ -23,6 +23,10 @@
 
 ## 🎯 **Experienced Developer? Which Guide Do I Need?**
 
+### **🤖 I'm an AI agent working on a PWA project**
+→ **READ FIRST:** **[PWA Agent Guide](/PWA_AGENT_GUIDE.md)** 🚨  
+Critical: File structure, build flow, common mistakes, debugging checklist
+
 ### **I'm building a mobile-first PWA**
 → Start with **[PWA Mobile UX Guide](/project-docs/PWA_MOBILE_UX_GUIDE.md)**  
 Learn: Touch events, responsive design, pages vs modals, mobile testing
