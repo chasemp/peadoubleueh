@@ -375,6 +375,104 @@ resetDemoData() {
 
 ---
 
+### Local Testing Environment Setup
+
+#### **Using Chrome Beta for PWA Testing**
+
+**Problem:** Testing PWAs locally can pollute your primary browser with test data, cached service workers, and development cookies.
+
+**Solution:** Use Chrome Beta as a dedicated testing browser.
+
+**Benefits:**
+- ✅ **Isolated Environment** - Keep test data separate from your daily browsing
+- ✅ **Clean Testing** - Easy to clear all data without affecting your main browser
+- ✅ **PWA Features** - Full PWA support (install, service workers, etc.)
+- ✅ **Side-by-side** - Run both regular Chrome and Beta simultaneously
+- ✅ **Automation Ready** - Works with testing tools like Playwright
+
+#### **Setup**
+
+**1. Install Chrome Beta:**
+```bash
+# macOS - Download from:
+# https://www.google.com/chrome/beta/
+
+# After installation, path will be:
+# /Applications/Google Chrome Beta.app/Contents/MacOS/Google Chrome Beta
+```
+
+**2. Configure MCP Playwright (for Cursor AI):**
+
+Add to `.cursor/mcp.json`:
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--browser",
+        "/Applications/Google Chrome Beta.app/Contents/MacOS/Google Chrome Beta"
+      ]
+    }
+  }
+}
+```
+
+**3. Manual Testing Workflow:**
+```bash
+# Start dev server
+npm run dev
+
+# Open in Chrome Beta (macOS)
+open -a "Google Chrome Beta" http://localhost:3000
+
+# Clear all Chrome Beta data when needed:
+# Chrome Beta → Settings → Privacy and Security → Clear Browsing Data
+# Select "All time" and check all boxes
+```
+
+#### **Testing Workflow**
+
+**Daily Development:**
+1. Use Chrome Beta for all PWA testing
+2. Your main Chrome stays clean for regular work
+3. Service worker updates don't affect your browsing
+4. Test data isolated from personal data
+
+**Clean Slate Testing:**
+1. Clear Chrome Beta data completely
+2. Test fresh PWA install experience
+3. Verify first-time user flow
+4. Test service worker registration from scratch
+
+**Automated Testing with Playwright:**
+- MCP Playwright automatically uses Chrome Beta
+- Tests run in isolated environment
+- Screenshots and recordings don't pollute main browser
+- Easy to reset between test runs
+
+#### **Alternative: Chrome Profiles**
+
+If you prefer using regular Chrome, create a dedicated testing profile:
+
+```bash
+# Launch Chrome with a specific profile
+google-chrome --user-data-dir=/tmp/chrome-testing-profile
+```
+
+**Comparison:**
+
+| Approach | Pros | Cons |
+|----------|------|------|
+| **Chrome Beta** | Completely separate, easier to clear all data | Need to install Beta |
+| **Chrome Profile** | No extra install needed | Manual profile management |
+| **Chrome Incognito** | Built-in, no persistence | Loses data between sessions |
+
+**Recommendation:** Chrome Beta for PWA development, Chrome Profile for quick tests.
+
+---
+
 ## 🔄 Development Workflow
 
 ### Pre-Commit Hooks for Regression Prevention
@@ -1510,202 +1608,56 @@ navigator.serviceWorker.register('/sw.js');
 
 ### **Critical: The /src → /docs Deployment Pattern**
 
-**The #1 architectural mistake we made across multiple PWA projects:**  
-Mixing source and built files in the same directory.
+**The #1 architectural mistake across multiple PWA projects:** Mixing source and built files in the same directory.
 
-#### The Problem
+#### The Problem in Brief
 
-Early PWA projects built directly to the repository root, causing:
-- **Lost work** - editing built files instead of source
-- **Deployment confusion** - live site serving stale builds
-- **Circular debugging** - "bugs" that were just old builds
-- **Commit churn** - build timestamps changing constantly
-- **PR chaos** - fixing "issues" that were deployment problems
+Caused lost work, deployment confusion, circular debugging, PR chaos, and commit churn from build timestamps.
 
-**Example symptom:** PR about "missing feature" when feature existed in source but wasn't built/deployed.
-
-#### The Solution: Clear Source/Build Separation
+#### The Solution
 
 ```
 your-pwa/
-├── src/                    # ✅ SOURCE - Edit here
-│   ├── index.html
-│   ├── js/
-│   ├── css/
-│   └── assets/
-│
-├── docs/                   # 🤖 BUILD OUTPUT - Auto-generated
-│   ├── index.html          # Built from src/
-│   ├── assets/             # Bundled JS/CSS
-│   ├── build               # Build version for cache debugging
-│   └── build-info.json     # Build metadata
-│
-├── public/                 # Static assets (copied to /docs)
-│   ├── manifest.json
-│   ├── icons/
-│   └── favicon.ico
-│
-├── .gitignore             # Ignore /build, /build-info.json
-├── .gitattributes         # Mark /docs as generated
-├── .cursorrules           # Warn AI about /docs
-└── vite.config.js         # Build /src → /docs
+├── src/          # ✅ Edit source code here
+├── public/       # Static assets (manifest, icons)
+├── docs/         # 🤖 Auto-generated build output
+└── vite.config.js
 ```
 
-#### Build Configuration (vite.config.js)
+**Core principle:** Never edit `/docs` - it's 100% generated from `/src` and `/public`.
 
-```javascript
-export default {
-  root: 'src',              // Serve from /src in dev
-  publicDir: '../public',   // Static assets
-  build: {
-    outDir: '../docs',      // Build to /docs
-    emptyOutDir: true,      // Safe to empty (only generated files)
-    rollupOptions: {
-      input: {
-        main: 'src/index.html',
-        settings: 'src/settings.html'
-        // ... other entry points
-      }
-    }
-  },
-  server: {
-    port: 3456
-  }
-}
-```
+#### Implementation Essentials
 
-#### Pre-Commit Hook (Automate Everything)
-
-```bash
-#!/bin/bash
-# .git/hooks/pre-commit
-
-set -e  # Exit on any error
-
-echo "🧪 Running critical regression tests..."
-npm test  # Or your test command
-
-echo "🔨 Building /src → /docs..."
-npm run build --silent
-
-# Copy build metadata for cache debugging
-if [ -f build ]; then
-    cp build docs/build
-fi
-if [ -f build-info.json ]; then
-    cp build-info.json docs/build-info.json
-fi
-
-# Stage built files
-git add docs/
-
-echo "✅ Tests passed and /docs built!"
-```
-
-**Result:** Can't forget to build, can't commit broken code, working directory stays clean.
-
-#### Build Metadata Strategy
-
-**Problem:** Build files (`build`, `build-info.json`) change every commit (timestamps) → endless commit churn.
-
-**Solution:**
-```
-/build                  → Gitignored (generated, not committed)
-/build-info.json        → Gitignored (generated, not committed)
-/docs/build             → Committed (for deployed cache debugging)
-/docs/build-info.json   → Committed (for deployed app metadata)
-```
-
-Pre-commit hook copies root → docs, only docs versions are committed.
-
-#### Protection Layers (4 Layers to Prevent Mistakes)
-
-1. **`.gitattributes`** - Mark as generated
-   ```
-   docs/** linguist-generated=true
-   docs/** text eol=lf
-   ```
-
-2. **`.cursorrules`** - Warn AI assistants
-   ```
-   # CRITICAL: DO NOT EDIT /docs - AUTO-GENERATED
-   # Edit /src instead, then run 'npm run build'
-   ```
-
-3. **HTML Comments** - Warn humans
-   ```html
-   <!--
-   ⚠️  AUTO-GENERATED FILE - DO NOT EDIT MANUALLY! ⚠️
-   This file was generated from /src
-   Edit /src/index.html and run 'npm run build'
-   -->
-   ```
-
-4. **Documentation** - Make it impossible to be confused
-   - `QUICK_START.md` in repository
-   - This guide
-   - README with clear instructions
-
-**Note:** Do NOT use filesystem read-only protection - it breaks git operations (pull, rebase, merge).
-
-#### GitHub Pages Configuration
-
-1. Go to repo Settings → Pages
-2. Source: Deploy from a branch
-3. Branch: `main`
-4. Folder: `/docs` ← **Critical setting**
-5. Custom domain: your-domain.com (optional)
-
-**No GitHub Actions needed** - Pages serves /docs directly.
+1. **Vite Config:** `root: 'src'`, `build.outDir: '../docs'`
+2. **Pre-commit Hook:** Auto-run tests + build + stage `/docs`
+3. **Gitignore:** Ignore root `/build`, `/build-info.json` (only commit `/docs` versions)
+4. **4 Protection Layers:** `.gitattributes`, `.cursorrules`, HTML comments, documentation
+5. **GitHub Pages:** Settings → Pages → Branch: main, Folder: `/docs`
 
 #### Daily Workflow
 
 ```bash
-# 1. Edit source (only edit /src!)
-vim src/index.html
-
-# 2. Test locally
-npm run dev  # → http://localhost:3456
-
-# 3. Commit (hook auto-builds)
-git add src/
-git commit -m "Add feature"  # ← Tests + build happen here
-
-# 4. Push to deploy
-git push  # → Live in ~2 minutes
+vim src/index.html          # 1. Edit source
+npm run dev                 # 2. Test locally
+git commit -m "Feature"     # 3. Commit (auto-builds)
+git push                    # 4. Deploy (live in ~2 min)
 ```
 
-**Post-commit:** `git status` should show clean working directory. If not, something's wrong.
+**Expected:** `git status` clean after commit. If not, something's misconfigured.
 
-#### Troubleshooting
+---
 
-**Issue:** Live site doesn't match code
-```bash
-# Check if /docs is up-to-date
-git status
+**📚 Complete Guide:** See [DEPLOYMENT_ARCHITECTURE.md](./DEPLOYMENT_ARCHITECTURE.md) for:
+- Complete setup instructions with all configuration files
+- Build metadata strategy details
+- Multiple protection layer implementations
+- Comprehensive troubleshooting guide
+- Migration from other patterns
+- Real-world examples and lessons learned
 
-# Rebuild manually if needed
-npm run build
-git add docs/
-git commit -m "Update /docs"
-git push
-```
+**This pattern is mandatory for all new PWA projects.**
 
-**Issue:** Pre-commit hook fails
-```bash
-# See errors
-npm run build
-
-# Fix issue, commit again
-```
-
-**Issue:** Git complains about /docs permissions
-```bash
-# Make writable (if you added read-only protection - don't!)
-chmod -R u+w docs/
-
-# Retry git operation
-```
+---
 
 #### Why This Matters
 

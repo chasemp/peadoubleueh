@@ -337,6 +337,8 @@ Watch for these warning signs in PWA architecture:
 **Critical Success Factor: Comprehensive Testing**
 > **"Never refactor without comprehensive tests. The confidence to change code comes from the certainty that you haven't broken anything."**
 
+📚 **See Also:** [PWA Development Workflow - Testing Strategies](./PWA_DEVELOPMENT_WORKFLOW.md#testing-strategies) for general testing patterns, test isolation, and CI/CD integration. This section focuses specifically on testing strategies for refactoring.
+
 ##### **Phase 1: Characterization Tests (Behavior Capture)**
 ```javascript
 // BEFORE refactoring - capture CURRENT behavior
