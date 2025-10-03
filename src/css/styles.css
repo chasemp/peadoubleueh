@@ -312,41 +312,101 @@ p {
   box-shadow: var(--shadow-md);
 }
 
-/* Modal Styles */
-.modal {
+/* Page Navigation Styles (Mobile-First Pattern) */
+.page {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: var(--spacing-md);
-}
-
-.modal-content {
   background-color: var(--color-background);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  max-width: 500px;
-  width: 100%;
-  max-height: 90vh;
+  z-index: 1000;
   overflow-y: auto;
+  padding-top: 60px; /* Account for fixed header */
 }
 
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.page-container {
   padding: var(--spacing-lg);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Settings Page Styles */
+.settings-section {
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-lg);
   border-bottom: 1px solid var(--color-border);
 }
 
-.modal-body {
-  padding: var(--spacing-lg);
+.settings-section:last-child {
+  border-bottom: none;
+}
+
+.settings-section h3 {
+  margin: 0 0 var(--spacing-md) 0;
+  color: var(--color-primary);
+  font-size: var(--font-size-lg);
+}
+
+.setting-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.setting-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-md);
+  cursor: pointer;
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-md);
+  transition: background-color var(--transition-fast);
+}
+
+.setting-label:hover {
+  background-color: var(--color-surface);
+}
+
+.setting-description {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  margin: var(--spacing-xs) 0 0 0;
+}
+
+.setting-input,
+.setting-toggle {
+  padding: var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-size: var(--font-size-md);
+  width: 100%;
+}
+
+.setting-toggle {
+  width: auto;
+  cursor: pointer;
+}
+
+.setting-info p {
+  margin: var(--spacing-sm) 0;
+  color: var(--color-text-secondary);
+}
+
+.setting-info a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.setting-info a:hover {
+  text-decoration: underline;
+}
+
+/* Back Button */
+#back-btn {
+  margin-right: var(--spacing-sm);
+  font-size: var(--font-size-xl);
 }
 
 /* Prompt Styles */
@@ -523,7 +583,7 @@ p {
   .header-actions,
   .install-prompt,
   .update-prompt,
-  .modal {
+  .page {
     display: none !important;
   }
   

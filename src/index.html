@@ -54,7 +54,8 @@
   <!-- Main App Structure -->
   <header class="header">
     <div class="header-content">
-      <h1>PWA Template</h1>
+      <button id="back-btn" class="btn btn-icon" aria-label="Back" style="display: none;">←</button>
+      <h1 id="page-title">PWA Template</h1>
       <div class="header-actions">
         <button id="theme-toggle" class="btn btn-icon" aria-label="Toggle theme">🌙</button>
         <button id="settings-btn" class="btn btn-icon" aria-label="Settings">⚙️</button>
@@ -154,29 +155,56 @@ npm run dev  # Start development server</code></pre>
     </div>
   </main>
 
-  <!-- Settings Modal -->
-  <div id="settings-modal" class="modal" style="display: none;">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>Settings</h3>
-        <button id="close-settings" class="btn btn-icon" aria-label="Close">×</button>
-      </div>
-      <div class="modal-body">
+  <!-- Settings Page -->
+  <div id="settings-page" class="page" style="display: none;">
+    <div class="container page-container">
+      <h2>Settings</h2>
+      
+      <div class="settings-section">
+        <h3>Appearance</h3>
         <div class="setting-group">
-          <label for="theme-select">Theme:</label>
-          <select id="theme-select">
+          <label for="theme-select">Theme</label>
+          <p class="setting-description">Choose your preferred color theme</p>
+          <select id="theme-select" class="setting-input">
             <option value="auto">Auto (System)</option>
             <option value="light">Light</option>
             <option value="dark">Dark</option>
           </select>
         </div>
+      </div>
+
+      <div class="settings-section">
+        <h3>Notifications</h3>
         <div class="setting-group">
-          <label for="notifications-toggle">Notifications:</label>
-          <input type="checkbox" id="notifications-toggle" checked>
+          <label for="notifications-toggle" class="setting-label">
+            <span>
+              <strong>Enable Notifications</strong>
+              <p class="setting-description">Receive updates and alerts</p>
+            </span>
+            <input type="checkbox" id="notifications-toggle" checked class="setting-toggle">
+          </label>
         </div>
+      </div>
+
+      <div class="settings-section">
+        <h3>Updates</h3>
         <div class="setting-group">
-          <label for="auto-update-toggle">Auto Update:</label>
-          <input type="checkbox" id="auto-update-toggle" checked>
+          <label for="auto-update-toggle" class="setting-label">
+            <span>
+              <strong>Auto Update</strong>
+              <p class="setting-description">Automatically install updates when available</p>
+            </span>
+            <input type="checkbox" id="auto-update-toggle" checked class="setting-toggle">
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3>About</h3>
+        <div class="setting-info">
+          <p><strong>Version:</strong> 1.0.0</p>
+          <p><strong>Build:</strong> <span id="build-version">Loading...</span></p>
+          <p><strong>Repository:</strong> <a href="https://github.com/chasemp/peadoubleueh" target="_blank" rel="noopener">GitHub</a></p>
         </div>
       </div>
     </div>
