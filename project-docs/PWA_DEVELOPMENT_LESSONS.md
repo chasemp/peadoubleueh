@@ -30,6 +30,10 @@ Learn: Modular architecture, service workers, state management, refactoring patt
 → Start with **[Multi-PWA Port Management](/project-docs/MULTI_PWA_PORT_MANAGEMENT.md)**  
 Learn: Port assignment strategy, conflict prevention, management scripts, best practices
 
+### **I need external resources, tools, or examples**
+→ Start with **[PWA Resources & References](/PWA_RESOURCES.md)**  
+Find: Interactive demos (What PWA Can Do Today), testing tools, learning materials, showcase sites
+
 ---
 
 ## 📚 **Complete Guide Descriptions**
@@ -146,6 +150,23 @@ Learn: Port assignment strategy, conflict prevention, management scripts, best p
 - NPM helper scripts for port management
 
 **Best for:** Developers managing multiple PWAs, teams with shared development environments
+
+---
+
+### **[PWA Resources & References](/PWA_RESOURCES.md)** (400+ lines)
+*Curated external resources, tools, and learning materials*
+
+**When to use:** Looking for external tools, examples, or learning resources
+
+**Topics:**
+- Interactive demos (What PWA Can Do Today - test device capabilities)
+- Official documentation (MDN, Web.dev, W3C)
+- Tools & utilities (icon generators, testing tools, performance analyzers)
+- Learning resources (books, courses, blogs)
+- Real-world examples (PWA showcase sites)
+- Community & support (forums, Discord, Twitter)
+
+**Best for:** Everyone - comprehensive external resource directory
 
 ---
 
