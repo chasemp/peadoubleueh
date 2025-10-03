@@ -584,6 +584,180 @@ import('/js/pwa/install.js').then(module => {
 3. **Always verify import paths** - static import failures are silent and hard to debug
 4. **Test both import types** during development to catch path issues early
 
+---
+
+### ES Modules & Vite Bundling
+
+**CRITICAL**: When using Vite as your build tool, JavaScript must use ES modules for proper bundling.
+
+#### **The Problem**
+
+**Symptom:** Production site loads but JavaScript doesn't execute, shows 404 errors for JS files
+```
+Failed to load resource: the server responded with a status of 404
+StorageManager.js:1  Failed to load resource: 404
+ThemeManager.js:1    Failed to load resource: 404
+```
+
+**Root Cause:** Vite requires `type="module"` on script tags to know which files to bundle.
+
+#### **❌ WRONG - Global Script Pattern**
+
+```html
+<!-- index.html -->
+<script src="js/utils/StorageManager.js"></script>
+<script src="js/utils/ThemeManager.js"></script>
+<script src="js/PWAApp.js"></script>
+```
+
+```javascript
+// StorageManager.js
+class StorageManager {
+  // ... implementation
+}
+
+// Make globally available
+window.StorageManager = StorageManager;  // ❌ Old pattern
+```
+
+**What happens:**
+- Vite doesn't recognize these as modules to bundle
+- HTML references are copied as-is to production
+- Individual JS files don't exist in `/docs` (not bundled)
+- Production fails with 404 errors
+
+#### **✅ CORRECT - ES Module Pattern**
+
+```html
+<!-- index.html -->
+<script type="module" src="js/PWAApp.js"></script>
+<!-- ↑ CRITICAL: type="module" tells Vite to bundle this -->
+```
+
+```javascript
+// StorageManager.js
+class StorageManager {
+  // ... implementation
+}
+
+// Export as ES module
+export default StorageManager;  // ✅ Correct
+```
+
+```javascript
+// PWAApp.js - Single entry point with imports
+import StorageManager from './utils/StorageManager.js';
+import ThemeManager from './utils/ThemeManager.js';
+import NotificationManager from './utils/NotificationManager.js';
+
+class PWAApp {
+  constructor() {
+    this.storageManager = new StorageManager();
+    this.themeManager = new ThemeManager();
+    // ...
+  }
+}
+
+// Initialize
+const app = new PWAApp();
+```
+
+**What happens:**
+- Vite sees `type="module"` and knows to bundle
+- Follows all imports from entry point
+- Bundles everything into `/docs/assets/main-[hash].js`
+- Production HTML gets: `<script type="module" src="./assets/main-[hash].js">`
+- Works perfectly! ✅
+
+#### **Migration Steps**
+
+If you have an existing project with global scripts:
+
+1. **Add ES module exports** to all JS files:
+   ```bash
+   # Replace in all files:
+   sed -i '' 's|window.ClassName = ClassName|export default ClassName|g' *.js
+   ```
+
+2. **Add imports** to entry point (PWAApp.js or main.js):
+   ```javascript
+   import StorageManager from './utils/StorageManager.js';
+   import ThemeManager from './utils/ThemeManager.js';
+   // ... all other dependencies
+   ```
+
+3. **Update HTML** to single module script:
+   ```html
+   <!-- Remove all individual script tags -->
+   <!-- Add single entry point -->
+   <script type="module" src="js/PWAApp.js"></script>
+   ```
+
+4. **Test build**:
+   ```bash
+   npm run build
+   # Check docs/ for bundled assets/main-[hash].js
+   ```
+
+#### **Key Rules**
+
+| Rule | Why | Example |
+|------|-----|---------|
+| **One entry point** | Vite bundles from single source | `PWAApp.js` imports everything |
+| **Use `export default`** | ES modules, not globals | `export default ClassName` |
+| **Use `import`** | Declare dependencies | `import Theme from './Theme.js'` |
+| **Add `type="module"`** | Tells Vite to bundle | `<script type="module" src="...">` |
+
+#### **Development vs Production**
+
+```
+DEVELOPMENT (npm run dev):
+└─ index.html
+   └─ <script type="module" src="js/PWAApp.js">
+      ├─ StorageManager.js     ← Served individually
+      ├─ ThemeManager.js       ← Hot module reload
+      └─ ...                   ← Fast refresh
+
+PRODUCTION (npm run build):
+└─ index.html
+   └─ <script type="module" src="./assets/main-a1b2c3.js">
+      └─ [All code bundled, minified, tree-shaken]
+```
+
+Both work identically because ES modules are used correctly!
+
+#### **Common Mistakes**
+
+```javascript
+// ❌ WRONG - Missing export
+class MyClass {}
+// Nothing - Vite can't find this
+
+// ❌ WRONG - CommonJS (Node.js style)
+module.exports = MyClass;  // Doesn't work in browser
+
+// ❌ WRONG - Named export when using default import
+export { MyClass };  // Import won't match
+
+// ✅ CORRECT - ES module default export
+export default MyClass;
+```
+
+#### **Real-World Example**
+
+**Problem:** `pea.523.life` stuck at "Loading..." with JS 404 errors
+
+**Solution:**
+- Converted 7 JS files from `window.X = X` to `export default X`
+- Added imports to `PWAApp.js`
+- Changed HTML from 7 script tags to 1 with `type="module"`
+- Build produced single `main-[hash].js` bundle
+- Production site worked perfectly ✅
+
+**Files changed:** [See commit 979425a]
+
+---
+
 ### Self-Contained PWA: Local Libraries vs CDNs
 
 #### **The Problem with CDN Dependencies**
