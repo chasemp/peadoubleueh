@@ -298,6 +298,29 @@ addTouchSupport(button, () => {
 - [ ] Remove all debug code
 - [ ] Verify no external dependencies
 
+### **Local Testing Environment**
+- [ ] Use Chrome Beta for PWA testing (keeps main browser clean)
+- [ ] Configure MCP Playwright with Chrome Beta path
+- [ ] Test fresh install by clearing all Chrome Beta data
+- [ ] Verify service worker registration from clean state
+
+**Chrome Beta Setup:**
+```bash
+# Install Chrome Beta, then configure MCP:
+# .cursor/mcp.json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--browser", 
+               "/Applications/Google Chrome Beta.app/Contents/MacOS/Google Chrome Beta"]
+    }
+  }
+}
+```
+
+**Full guide:** [Development Workflow - Local Testing Environment](./PWA_DEVELOPMENT_WORKFLOW.md#local-testing-environment-setup)
+
 ---
 
 ## 🚀 Deployment Quick Reference
@@ -309,61 +332,32 @@ addTouchSupport(button, () => {
 ```
 your-pwa/
 ├── src/      # ✅ Edit here
+├── public/   # Static assets  
 ├── docs/     # 🤖 Auto-generated
-└── public/   # Static assets
-```
-
-### 5-Minute Setup
-
-```bash
-# 1. Clone template or create structure
-mkdir -p src public docs
-
-# 2. Configure vite.config.js
-# root: 'src', build.outDir: '../docs'
-
-# 3. Add pre-commit hook
-# Tests + build + stage /docs
-
-# 4. Create protections
-# .gitattributes, .cursorrules, .gitignore
-
-# 5. Configure GitHub Pages
-# Settings → Pages → Branch: main, Folder: /docs
 ```
 
 ### Daily Workflow
 
 ```bash
-# 1. Edit (only in /src!)
-vim src/index.html
-
-# 2. Test locally
-npm run dev
-
-# 3. Commit (hook auto-builds)
-git commit -m "Feature"  # ← Tests & build happen here
-
-# 4. Push
-git push  # → Live in ~2 min
+vim src/index.html            # 1. Edit source
+npm run dev                   # 2. Test locally
+git commit -m "Feature"       # 3. Commit (auto-builds)
+git push                      # 4. Deploy (live in ~2 min)
 ```
 
-### vite.config.js Template
+### Essential Config
 
+**vite.config.js:**
 ```javascript
 export default {
   root: 'src',
   publicDir: '../public',
-  build: {
-    outDir: '../docs',
-    emptyOutDir: true
-  },
+  build: { outDir: '../docs', emptyOutDir: true },
   server: { port: 3456 }
 }
 ```
 
-### Pre-Commit Hook Template
-
+**Pre-commit hook:**
 ```bash
 #!/bin/bash
 set -e
@@ -374,33 +368,39 @@ cp build-info.json docs/build-info.json
 git add docs/
 ```
 
+**.gitignore:**
+```
+/build
+/build-info.json
+```
+
 ### Quick Troubleshooting
 
 | Problem | Solution |
 |---------|----------|
-| Working directory not clean after commit | Add `/build`, `/build-info.json` to .gitignore |
-| Live site doesn't match code | Run `npm run build`, check `git status`, commit `/docs` |
-| Pre-commit hook fails | Run `npm run build` to see errors |
-| Git permission errors on /docs | `chmod -R u+w docs/` (don't use read-only protection) |
+| Working directory not clean | Ensure `/build`, `/build-info.json` in `.gitignore` |
+| Live site doesn't match code | Run `npm run build`, commit `/docs`, push |
+| Pre-commit hook fails | Run `npm run build` to see detailed errors |
+| Git permission errors | Run `chmod -R u+w docs/` (never use read-only) |
 
-### Protection Checklist
+### Setup Checklist
 
 - [ ] `.gitattributes` marks `/docs` as generated
 - [ ] `.cursorrules` warns AI about `/docs`
-- [ ] HTML comments in built files warn developers
-- [ ] Documentation (QUICK_START.md) explains workflow
 - [ ] `.gitignore` excludes root build artifacts
 - [ ] Pre-commit hook automates build
-- [ ] GitHub Pages set to `/docs` folder
+- [ ] GitHub Pages: Branch `main`, Folder `/docs`
 
 ### Success Criteria
 
 ✅ Developers only edit `/src`  
 ✅ `git status` clean after commits  
 ✅ Live site updates within 2 minutes  
-✅ No one asks "which file is latest?"
+✅ No confusion about "which file is latest"
 
-**Full guide:** [DEPLOYMENT_ARCHITECTURE.md](./DEPLOYMENT_ARCHITECTURE.md)
+---
+
+**📚 Complete Guide:** [DEPLOYMENT_ARCHITECTURE.md](./DEPLOYMENT_ARCHITECTURE.md) for full setup, protection layers, build metadata strategy, troubleshooting, and migration guide.
 
 ---
 
